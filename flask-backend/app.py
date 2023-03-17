@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 # from pomegranate import *
 from flask import Flask, request, render_template
+from flask_cors import CORS, cross_origin
 
 from DataProcessing import DataProcessing
 # from HMMDataProcessing import HMMDataProcessing
@@ -28,10 +29,12 @@ def too_large(e):
     return "File is too large", 413
 
 @app.route("/members")
+@cross_origin()
 def members():
   return {"members": ["Member 1", "Member 2", "Member 3"]}
 
 @app.route('/')
+@cross_origin()
 def index():
   with open(app.config['MODEL_CONFIG_PATH'], 'r') as f:
     global modelListConfig
@@ -43,6 +46,7 @@ def index():
   # return render_template('index.html', hostUrl=url)
 
 @app.route('/models')
+@cross_origin()
 def models():
   with open(app.config['MODEL_CONFIG_PATH'], 'r') as f:
     global modelListConfig
@@ -59,6 +63,7 @@ def models():
   return {'data': modelOptions, 'status': 'ok', 'errMsg': ''}
 
 @app.route('/mel-spectrogram', methods=['POST'])
+@cross_origin()
 def melSpectrogram():
   # 1). Empty upload directory
   emptyDirectory(app.config['MEL_SPEC_DIR'])
@@ -135,6 +140,7 @@ def melSpectrogram():
   
 
 @app.route('/predict', methods=['POST'])
+@cross_origin()
 def predict():
   # 1). Empty upload directory
   emptyDirectory(app.config['UPLOAD_DIR'])

@@ -4,9 +4,11 @@ import { MainPage } from './Components/MainPage/MainPage'
 
 function App() {
   const [data, setData] = useState([{}])
+  // const domain = "https://ebmp-api.herokuapp.com/"
+  const domain = "http://localhost:5000/"
 
   useEffect(() => {
-    fetch("/members").then(
+    fetch(domain + "members").then(
       res => {
         if (res.status === 200) {
           return res.json();
