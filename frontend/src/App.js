@@ -1,33 +1,43 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import {Routes, Route} from 'react-router-dom'
+import { Helmet } from 'react-helmet';
 
-import { MainPage } from './Components/MainPage/MainPage'
+import './App.css'
+
+import { HomePage } from './components/HomePage/HomePage'
+import { LyricsEmotionClassification } from './components/LyricsEmotionClassification/LyricsEmotionClassification'
+import { MusicEmotionClassification } from './components/MusicEmotionClassification/MusicEmotionClassification'
+import { MusicGeneration } from './components/MusicGeneration/MusicGeneration'
+import { MusicRecommendation } from './components/MusicRecommendation/MusicRecommendation'
+import { SpeechEmotionRecognition } from './components/SpeechEmotionRecognition/SpeechEmotionRecognition'
+
 
 function App() {
-  const [data, setData] = useState([{}])
+  // const [data, setData] = useState([{}])
   // const domain = "https://ebmp-api.herokuapp.com/"
-  const domain = "http://localhost:5000/"
+  // const domain = "http://localhost:5000/"
 
-  useEffect(() => {
-    fetch(domain + "members").then(
-      res => {
-        if (res.status === 200) {
-          return res.json();
-        }
-      }
-    ).then(
-      data => {
-        setData(data)
-      }
-    )
-  }, [])
 
   return (
     <div>
-      {(typeof data.members === 'undefined') ? (
+      <Helmet>
+        <title>Emotion-based Music Provider</title>
+        <meta name='description' content='Emotion-based Music Provider Application' />
+      </Helmet>
+      <Routes>
+        <Route path="/" element={<HomePage/>} />
+        <Route path="/lyrics-emotion-classification" element={<LyricsEmotionClassification/>} />
+        <Route path="/music-emotion-classification" element={<MusicEmotionClassification/>} />
+        <Route path="/music-generation" element={<MusicGeneration/>} />
+        <Route path="/music-recommendation" element={<MusicRecommendation/>} />
+        <Route path="/speech-emotion-recognition" element={<SpeechEmotionRecognition/>} />
+      </Routes>
+      {/* {(typeof data.members === 'undefined') ? (
         <p>Loading...</p>
       ): (
-        <MainPage data={data}/>
-      )}
+        
+        <HomePage data={data}/>
+      )} */}
     </div>
   )
 }

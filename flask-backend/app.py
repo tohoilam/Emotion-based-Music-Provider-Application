@@ -22,7 +22,7 @@ app.config['MODEL_PATH'] = MODEL_PATH
 app.config['MODEL_CONFIG_PATH'] = MODEL_CONFIG_PATH
 app.config['MEL_SPEC_DIR'] = MEL_SPEC_DIR
 
-modelListConfig = None
+# modelListConfig = None
 
 @app.errorhandler(413)
 def too_large(e):
@@ -33,132 +33,143 @@ def too_large(e):
 def members():
   return {"members": ["Member 1", "Member 2", "Member 3"]}
 
-@app.route('/')
-@cross_origin()
-def index():
-  with open(app.config['MODEL_CONFIG_PATH'], 'r') as f:
-    global modelListConfig
-    modelListConfig = json.load(f)
+# @app.route('/')
+# @cross_origin()
+# def index():
+#   with open(app.config['MODEL_CONFIG_PATH'], 'r') as f:
+#     global modelListConfig
+#     modelListConfig = json.load(f)
 
-  url = request.host_url
+  # url = request.host_url
   # if url[4] != 's':
   #   url = url[:4] + 's' + url[4:]
   # return render_template('index.html', hostUrl=url)
 
-@app.route('/models')
+@app.route('/speech-emotion-recognition/models')
 @cross_origin()
 def models():
-  with open(app.config['MODEL_CONFIG_PATH'], 'r') as f:
-    global modelListConfig
-    modelListConfig = json.load(f)
-    modelOptions = []
-    count = 0
-    for modelConfig in modelListConfig:
-      modelOptions.append({
-        'id': count,
-        'name': modelConfig['name']
-      })
-      count += 1
-  
+  modelListConfig = getModelConfig()
+  if (not modelListConfig):
+    errMsg = 'Fail to access model config file'
+    print('Failed: ' + errMsg)
+    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+
+  modelOptions = []
+  count = 0
+  for modelConfig in modelListConfig:
+    modelOptions.append({
+      'id': count,
+      'name': modelConfig['name']
+    })
+    count += 1
+
   return {'data': modelOptions, 'status': 'ok', 'errMsg': ''}
 
-@app.route('/mel-spectrogram', methods=['POST'])
-@cross_origin()
-def melSpectrogram():
-  # 1). Empty upload directory
-  emptyDirectory(app.config['MEL_SPEC_DIR'])
+# @app.route('/mel-spectrogram', methods=['POST'])
+# @cross_origin()
+# def melSpectrogram():
+#   # 1). Empty upload directory
+#   emptyDirectory(app.config['MEL_SPEC_DIR'])
   
-  # 2). Check if model choice parameter is passed correctly
-  if ('modelChoice' not in request.form or request.form['modelChoice'] == 'null'):
-    errMsg = 'Model is not selected! Please select a model from dropdown!'
-    print('Failed: ' + errMsg)
-    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+#   # 2). Check if model choice parameter is passed correctly
+#   if ('modelChoice' not in request.form or request.form['modelChoice'] == 'null'):
+#     errMsg = 'Model is not selected! Please select a model from dropdown!'
+#     print('Failed: ' + errMsg)
+#     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   
-  # 3). Check if 
-  if ('dataFileName' in request.form and request.form['dataFileName'] != 'null'):
-    dataFileName = request.form['dataFileName']
-    dataFileName = dataFileName[:dataFileName.find('.')] + ".wav"
-  else:
-    errMsg = f"File is not indicated!"
-    print('Failed: ' + errMsg)
-    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+#   # 3). Check if 
+#   if ('dataFileName' in request.form and request.form['dataFileName'] != 'null'):
+#     dataFileName = request.form['dataFileName']
+#     dataFileName = dataFileName[:dataFileName.find('.')] + ".wav"
+#   else:
+#     errMsg = f"File is not indicated!"
+#     print('Failed: ' + errMsg)
+#     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
 
-  # 4). B Only: Load and Process data
-  modelChoice = int(request.form['modelChoice'])
-  model, dataModel = getModelAndData(modelChoice, dataFileName=dataFileName)
+#   # 4). B Only: Load and Process data
+#   modelChoice = int(request.form['modelChoice'])
+#   model, dataModel = getModelAndData(modelChoice, modelListConfig, dataFileName=dataFileName)
   
-  # 5). Model Prediction
-  try:
-    y_pred = np.argmax(model.predict(dataModel.x_test), axis=1)
-  except Exception as e:
-    errMsg = 'Emotion Prediction from Model Failed! ' + e
-    print('Failed: ' + errMsg)
-    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+#   # 5). Model Prediction
+#   try:
+#     y_pred = np.argmax(model.predict(dataModel.x_test), axis=1)
+#   except Exception as e:
+#     errMsg = 'Emotion Prediction from Model Failed! ' + e
+#     print('Failed: ' + errMsg)
+#     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   
-  print('Result Predicted!')
+#   print('Result Predicted!')
   
-  # 6). Pack mel-spectrogram
-  path = os.path.join('static', 'melSpec')
-  try:
-    png_filenames = dataModel.saveMelSpectrogramImage(path)
-    png_images_data = []
+#   # 6). Pack mel-spectrogram
+#   path = os.path.join('static', 'melSpec')
+#   try:
+#     png_filenames = dataModel.saveMelSpectrogramImage(path)
+#     png_images_data = []
     
-    for i in range(len(png_filenames)):
-      png_filename = png_filenames[i]
-      recording_name = dataModel.recording_names[i][0]
-      section = dataModel.recording_names[i][1]
-      predicted_label = dataModel.labels_name[y_pred[i]]
+#     for i in range(len(png_filenames)):
+#       png_filename = png_filenames[i]
+#       recording_name = dataModel.recording_names[i][0]
+#       section = dataModel.recording_names[i][1]
+#       predicted_label = dataModel.labels_name[y_pred[i]]
       
-      png_filepath = os.path.join(path, png_filename)
+#       png_filepath = os.path.join(path, png_filename)
       
-      if os.path.isfile(png_filepath):
-        import base64
-        with open(png_filepath, "rb") as img_file:
-          print(png_filepath)
-          image_string = base64.b64encode(img_file.read()).decode("utf-8")
+#       if os.path.isfile(png_filepath):
+#         import base64
+#         with open(png_filepath, "rb") as img_file:
+#           print(png_filepath)
+#           image_string = base64.b64encode(img_file.read()).decode("utf-8")
           
-          png_images_data.append({
-            'name': recording_name,
-            'section': section,
-            'mel_spectrogram': image_string,
-            'emotion': predicted_label
-          })
-      else:
-        errMsg = f"Cannot find outputted mel spectrogram image in backend!'"
-        print('Failed: ' + errMsg)
-        return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+#           png_images_data.append({
+#             'name': recording_name,
+#             'section': section,
+#             'mel_spectrogram': image_string,
+#             'emotion': predicted_label
+#           })
+#       else:
+#         errMsg = f"Cannot find outputted mel spectrogram image in backend!'"
+#         print('Failed: ' + errMsg)
+#         return {'data': [], 'status': 'failed', 'errMsg': errMsg}
     
-    print(f"Length = {len(png_images_data)}")
-    return {'data': png_images_data, 'status': 'ok', 'errMsg': ''}
+#     print(f"Length = {len(png_images_data)}")
+#     return {'data': png_images_data, 'status': 'ok', 'errMsg': ''}
       
-  except Exception as e:
-    errMsg = 'Save mel-spectrogram image in backend failed! ' + str(e)
-    print('Failed: ' + errMsg)
-    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+#   except Exception as e:
+#     errMsg = 'Save mel-spectrogram image in backend failed! ' + str(e)
+#     print('Failed: ' + errMsg)
+#     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   
     
   
 
-@app.route('/predict', methods=['POST'])
+@app.route('/speech-emotion-recognition/predict', methods=['POST'])
 @cross_origin()
 def predict():
-  # 1). Empty upload directory
+  print('predict')
+  # 1). Get model config
+  modelListConfig = getModelConfig()
+  if (not modelListConfig):
+    errMsg = 'Fail to access model config file'
+    print('Failed: ' + errMsg)
+    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+
+  # 2). Empty upload directory
   emptyDirectory(app.config['UPLOAD_DIR'])
     
-  # 2). Check if model choice parameter is passed correctly
+  # 3). Check if model choice parameter is passed correctly
   if ('modelChoice' not in request.form or request.form['modelChoice'] == 'null'):
     errMsg = 'Model is not selected! Please select a model from dropdown!'
     print('Failed: ' + errMsg)
     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   
-  # 3). Get audio files and save in backend
+  # 4). Get audio files and save in backend
   if (len(request.files) != 0):
     for filename in request.files:
       try:
         file = request.files[filename]
         file.save(os.path.join(app.config['UPLOAD_DIR'], file.filename))
       except Exception as e:
-        errMsg = 'Save audio file in backend failed! ' + e
+        errMsg = 'Save audio file in backend failed! ' + str(e)
         print('Failed: ' + errMsg)
         return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   else:
@@ -166,15 +177,15 @@ def predict():
     print('Warning: ' + warnMsg)
     return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
 
-  # 4). A: Get Model Choice and Configure Model; B: Load and Process data
+  # 5). A: Get Model Choice and Configure Model; B: Load and Process data
   modelChoice = int(request.form['modelChoice'])
-  # print(modelChoice)
   if (modelListConfig != None):
-    model, dataModel = getModelAndData(modelChoice)
-  # elif ((modelListConfig != None) & (modelListConfig[modelChoice]["isHMM"] == 1)):
-  #   model, dataModel = getHMMAndData(modelChoice)  
-  # 5). Model Prediction
-  # if (modelListConfig[modelChoice]["isHMM"] == 0):
+    status, res = getModelAndData(modelChoice, modelListConfig)
+    if (status != 'ok'):
+      return {'data': [], 'status': status, 'errMsg': res}
+    
+    model, dataModel = res
+
   try:
     y_percentages = model.predict(dataModel.x_test)
     y_pred = np.argmax(y_percentages, axis=1)
@@ -182,28 +193,10 @@ def predict():
     errMsg = 'Emotion Prediction from Model Failed! ' + e
     print('Failed: ' + errMsg)
     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
-  # elif (modelListConfig[modelChoice]["isHMM"] == 1):
-  #   try:
-  #     y_percentages = []
-  #     y_pred = []
-  #     current_index = 0
-  #     result = model.predict_proba(dataModel.x_test)
-  #     for _, count in enumerate(dataModel.count_list):
-  #       y_percentage = np.array([0,0,0,0,0])
-  #       for i in range(count):
-  #           y_percentage = np.add(y_percentage, result[current_index]/count)
-  #           current_index += 1
-  #       y_percentages.append(y_percentage)
-  #       y_pred.append(np.argmax(y_percentage))    
-  #   except Exception as e:
-  #     errMsg = 'Emotion Prediction from Model Failed! ' + e
-  #     print('Failed: ' + errMsg)
-  #     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+
   print('Result Predicted!')
   
-  print(y_percentages)
-  print(y_pred)
-  # 5). Pack and return
+  # 6). Pack and return
   predicted_data_list = []
   for i, pred in enumerate(y_pred):
     y_percentage = y_percentages[i]
@@ -237,8 +230,7 @@ def emptyDirectory(directory):
       print('Failed: ' + errMsg)
       return {'data': [], 'status': 'failed', 'errMsg': errMsg}
 
-def getModelAndData(modelChoice, dataFileName=None):
-  global modelListConfig
+def getModelAndData(modelChoice, modelListConfig, dataFileName=None):
   if (modelListConfig != None):
     if (modelChoice < len(modelListConfig)):
       modelConfig = modelListConfig[modelChoice]
@@ -262,7 +254,7 @@ def getModelAndData(modelChoice, dataFileName=None):
       except Exception as e:
         errMsg = f"Loading model '{modelName}' Failed! " + e
         print('Failed: ' + errMsg)
-        return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+        return 'failed', errMsg
       
       # B). Get Data Model
       try:
@@ -279,60 +271,26 @@ def getModelAndData(modelChoice, dataFileName=None):
       except Exception as e:
         errMsg = 'Data Processing Failed! ' + str(e)
         print('Failed: ' + errMsg)
-        return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+        return 'failed', errMsg
 
-      return model, dataModel
+      return 'ok', (model, dataModel)
     else:
       errMsg = 'Selected model not available in backed!'
       print('Failed: ' + errMsg)
-      return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+      return 'failed', errMsg
   else:
     errMsg = 'modelListConfig variables not initialize in backend'
     print('Failed: ' + errMsg)
-    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+    return 'failed', errMsg
 
-# def getHMMAndData(modelChoice, dataFileName=None):
-#   global modelListConfig
-#   if (modelListConfig != None):
-#     if (modelChoice < len(modelListConfig)):
-#       modelConfig = modelListConfig[modelChoice]
-#       modelName = modelConfig['name']
-#       folderName = modelConfig['folderName']
-#       labelsToInclude = modelConfig['labelsToInclude']
-
-#       # A). Get Model
-#       try:
-#         print(f"Loading Model {modelName} from {app.config['MODEL_PATH']}/{folderName}...")
-#         modelDir = os.path.join(os.getcwd(), app.config['MODEL_PATH'], folderName, "model.json")
-#         with open(modelDir, 'r') as openfile:
-#             json_object = json.load(openfile)
-#         model = HiddenMarkovModel.from_json(json_object)
-#         print('   Model Loading Completed!')
-#       except Exception as e:
-#         errMsg = f"Loading model '{modelName}' Failed! " + e
-#         print('Failed: ' + errMsg)
-#         return {'data': [], 'status': 'failed', 'errMsg': errMsg}
-      
-#       # B). Get Data Model
-#       try:
-#         dataModel = HMMDataProcessing(labelsToInclude=labelsToInclude)
-#         dataModel.loadAndExtractTestData(app.config['UPLOAD_DIR'], dataFileName=dataFileName)
-#         dataModel.processData()
-#       except Exception as e:
-#         errMsg = 'Data Processing Failed! ' + e
-#         print('Failed: ' + errMsg)
-#         return {'data': [], 'status': 'failed', 'errMsg': errMsg}
-
-#       return model, dataModel
-#     else:
-#       errMsg = 'Selected model not available in backed!'
-#       print('Failed: ' + errMsg)
-#       return {'data': [], 'status': 'failed', 'errMsg': errMsg}
-#   else:
-#     errMsg = 'modelListConfig variables not initialize in backend'
-#     print('Failed: ' + errMsg)
-#     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+def getModelConfig():
+  try:
+    with open(app.config['MODEL_CONFIG_PATH'], 'r') as f:
+      return json.load(f)
+  except:
+    return None
 
 if __name__ == "__main__":
-	port = int(os.environ.get('PORT', 5000))
-	app.run(host='0.0.0.0', port=port, debug=True)
+  port = int(os.environ.get('PORT', 5000))
+  # app.run(host='0.0.0.0', port=port)
+  app.run(host='0.0.0.0', port=port, debug=True)
