@@ -3,6 +3,7 @@ import {Routes, Route} from 'react-router-dom'
 import { Helmet } from 'react-helmet';
 
 import './App.css'
+import './Common.css'
 
 import { HomePage } from './components/HomePage/HomePage'
 import { LyricsEmotionClassification } from './components/LyricsEmotionClassification/LyricsEmotionClassification'
@@ -38,6 +39,7 @@ function App() {
         
         <HomePage data={data}/>
       )} */}
+      <script src="https://open.spotify.com/embed-podcast/iframe-api/v1" async></script>
     </div>
   )
 }

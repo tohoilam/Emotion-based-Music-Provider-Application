@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 
+import { RecordButton } from '../../common/RecordButton/RecordButton'
 import SERApi from '../../routes/SERApi'
+
 import './SpeechEmotionRecognition.css'
-import { useReactMediaRecorder } from 'react-media-recorder'
 
 export const SpeechEmotionRecognition = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,12 +11,11 @@ export const SpeechEmotionRecognition = () => {
 	const [audioList, setAudioList] = useState([]);
 	const [dropActive, setDropActive] = useState([]);
 	const [emotionResponseList, setEmotionResponseList] = useState([]);
+	const [recordedAudio, setRecordedAudio] = useState(null);
 	const audioFileInputRef= useRef(null);
 	const modelChoiceRef = useRef(null);
 
   // const sampleRate = 16000;
-
-	const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ video: false });
 
 	const dropFiles = (e) => {
 		e.preventDefault();
@@ -97,38 +97,11 @@ export const SpeechEmotionRecognition = () => {
     fetchSERModels();
   }, [])
 
-	useEffect(() => {
-		const prepareRecording = async () => {
-			if (status === 'stopped') {
-
-				const fileName = new Date().toLocaleString('en-US', {
-																timeZone: 'Hongkong'
-															})
-															.replaceAll(',', '')
-															.replaceAll('/', '-')
-															.replace(':', 'h')
-															.replace(':', 'm');
-
-				const className = fileName.replaceAll(' ', '-');
-
-				const blob = await fetch(mediaBlobUrl).then(r => r.blob());
-				blob.name = fileName + ".wav";
-
-
-				const audioObject = {
-					blob: blob,
-					blobUrl: mediaBlobUrl,
-					fileName: fileName + ".wav",
-					className: className
-				}
-
-				setAudioList(audioList => [...audioList, audioObject]);
-
-			}
-		}
-
-		prepareRecording();
-	}, [mediaBlobUrl, status])
+  useEffect(() => {
+    if (recordedAudio) {
+			setAudioList(audioList => [...audioList, recordedAudio]);
+    }
+  }, [recordedAudio]);
 
   return (
     (isLoading)
@@ -164,9 +137,10 @@ export const SpeechEmotionRecognition = () => {
         <section id="recording-section">
           <h1 className="recording-header">Record</h1>
           <div id="recording-control">
-            <div data-role="controls">
+            {/* <div data-role="controls">
 							<button data-recording={status} onClick={(status === "recording") ? stopRecording : startRecording}>Record</button>
-            </div>
+            </div> */}
+						<RecordButton setRecordedAudio={setRecordedAudio}></RecordButton>
           </div>
         </section>
         <section id="predict-button-section">

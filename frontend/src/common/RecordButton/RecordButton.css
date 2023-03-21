@@ -1,0 +1,33 @@
+.record-box {
+  width: 100%;
+  aspect-ratio: 1;
+  background-color: rgb(219, 219, 219);
+  border-radius: 50%;
+  border: 3px solid #333;
+}
+
+[data-role="controls"] > button {
+  margin: 15%;
+  outline: none;
+  display: block;
+  border: none;
+  background-color: #D9AFD9;
+  background-image: linear-gradient(0deg, #D9AFD9 0%, #97D9E1 100%);
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  text-indent: -100em;
+  cursor: pointer;
+  box-shadow: 0px 5px 5px 2px rgba(0, 0, 0, 0.3) inset;
+      /* 0px 0px 0px 20px rgb(219, 219, 219), 0px 0px 0px 15px #333; */
+}
+
+[data-role="controls"] > button:hover {
+  background-color: #ee7bee;
+  background-image: linear-gradient(0deg, #ee7bee 0%, #6fe1f5 100%);
+}
+
+[data-role="controls"] > button[data-recording="recording"] {
+  background-color: #ff2038;
+  background-image: linear-gradient(0deg, #ff2038 0%, #b30003 100%);
+}
