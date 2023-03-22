@@ -58,6 +58,9 @@ export const HomePage = () => {
             <iframe src="https://open.spotify.com/embed/track/43rA71bccXFGD4C8GOpIlN?si=1d29599053f34ff2" width="225" height="152" frameBorder="0"></iframe>
             <iframe src="https://open.spotify.com/embed/track/43rA71bccXFGD4C8GOpIlN?si=1d29599053f34ff2" width="225" height="152" frameBorder="0"></iframe>
             <iframe src="https://open.spotify.com/embed/track/43rA71bccXFGD4C8GOpIlN?si=1d29599053f34ff2" width="225" height="152" frameBorder="0"></iframe>
+            <iframe src="https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT?si=3c782ac715ee4ea5" width="225" height="152" frameBorder="0"></iframe>
+            <iframe src="https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT?si=3c782ac715ee4ea5" width="225" height="152" frameBorder="0"></iframe>
+            <iframe src="https://open.spotify.com/embed/track/4cOdK2wGLETKBW3PvgPWqT?si=3c782ac715ee4ea5" width="225" height="152" frameBorder="0"></iframe>
 
           </div>
         </section>
