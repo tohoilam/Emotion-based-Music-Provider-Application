@@ -6,14 +6,14 @@ from flask import Flask, request
 from flask import Blueprint
 from flask_cors import cross_origin
 
-from DataProcessing import DataProcessing
+from components.speech_emotion_recognition.SERDataProcessing import SERDataProcessing
 
 speech_emotion_recognition_blueprint = Blueprint('speech_emotion_recognition', __name__)
 
 PATH_DIR_NAME = '/speech-emotion-recognition'
 
 MODEL_PATH = os.path.join('components', 'speech_emotion_recognition')
-MODEL_CONFIG_PATH = os.path.abspath(os.path.join('static', 'models.json'))
+MODEL_CONFIG_PATH = os.path.abspath(os.path.join('components', 'speech_emotion_recognitions', 'models.json'))
 
 @speech_emotion_recognition_blueprint.errorhandler(413)
 def too_large(e):
@@ -142,14 +142,14 @@ def getModelAndData(modelChoice, modelListConfig, fileList, dataFileName):
       
       # B). Get Data Model
       try:
-        dataModel = DataProcessing(labelsToInclude=labelsToInclude,
-                                  splitDuration=splitDuration,
-                                  ignoreDuration=ignoreDuration,
-                                  transformByStft=transformByStft,
-                                  hop_length=hop_length,
-                                  win_length=win_length,
-                                  n_mels=n_mels,
-                                  timeShape=timeShape)
+        dataModel = SERDataProcessing(labelsToInclude=labelsToInclude,
+                                      splitDuration=splitDuration,
+                                      ignoreDuration=ignoreDuration,
+                                      transformByStft=transformByStft,
+                                      hop_length=hop_length,
+                                      win_length=win_length,
+                                      n_mels=n_mels,
+                                      timeShape=timeShape)
         dataModel.loadAndExtractTestData(fileList, dataFileName)
         dataModel.processData()
       except Exception as e:

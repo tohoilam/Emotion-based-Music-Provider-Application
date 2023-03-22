@@ -7,7 +7,7 @@ import tensorflow as tf
 from flask import Flask, request, render_template
 from flask_cors import CORS, cross_origin
 
-from DataProcessing import DataProcessing
+from components.speech_emotion_recognition.SERDataProcessing import SERDataProcessing
 # from HMMDataProcessing import HMMDataProcessing
 
 from blueprints.music_generation_blueprint import music_generation_blueprint

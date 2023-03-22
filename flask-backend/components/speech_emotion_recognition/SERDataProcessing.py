@@ -11,7 +11,7 @@ import noisereduce as nr
 import cv2
 
 
-class DataProcessing:
+class SERDataProcessing:
   def __init__(self, labelsToInclude=[], splitDuration=8, ignoreDuration=1, transformByStft=False, hop_length=512, win_length=2048, n_mels=128, timeShape=False):
     # Hyperparameter
     self.splitDuration = splitDuration
