@@ -31,79 +31,29 @@ class DataProcessing:
       self.labels_name = ['Neutral', 'Frustration', 'Anger', 'Sadness', 'Happiness', 'Excitement', 'Surprise', 'Disgust', 'Fear']
     else:
       self.labels_name = labelsToInclude
-      
-  def loadAndExtractTestData(self, path, dataFileName=None):
+
+  def loadAndExtractTestData(self, audioBytesList, fileNameList):
     x_list = []
     sr_list = []
     recording_names = []
     
-    data_path = os.path.join(os.getcwd(), path)
-    
     # Convert audio file to wav format
-    for dirname, _, filenames in os.walk(data_path):
-      for filename in filenames:
+    for i, audioBytes in enumerate(audioBytesList):
+      audio = AudioSegment.from_file(audioBytes)
         
-        if (filename == 'desktop.ini' or filename == 'desktop.in.txt' or filename == '.DS_Store' or filename == '.DS'):
-          continue
+      if (audio.frame_rate != 16000):
+        audio = audio.set_frame_rate(16000)
+      if (audio.channels != 1):
+        audio = audio.set_channels(1)
         
-        if (filename[-4:] != '.wav'):
-          original_file = os.path.join(dirname, filename)
-          wav_filename = os.path.join(dirname, filename[:-4] + ".wav")
-          if (filename[-4:] == '.m4a'):
-            track = AudioSegment.from_file(original_file,  format='m4a')
-            file_handle = track.export(wav_filename, format='wav')
-          elif (filename[-4:] == '.mp3'):
-            track = AudioSegment.from_mp3(original_file)
-            file_handle = track.export(wav_filename, format='wav')
-          elif (filename[-4:] == '.ogg' or filename[-5:] == '.opus'):
-            track = AudioSegment.from_ogg(original_file)
-            file_handle = track.export(wav_filename, format='wav')
-          elif (filename[-3:] == '.au'):
-            track = AudioSegment.from_file(original_file,  format='au')
-            file_handle = track.export(wav_filename, format='wav')
-    
-    # Delete non wav file
-    # Convert audio file to wav format
-    for dirname, _, filenames in os.walk(data_path):
-      for filename in filenames:
-        
-        if (filename == 'desktop.ini' or filename == 'desktop.in.txt' or filename == '.DS_Store' or filename == '.DS'):
-          continue
-        
-        if (filename[-4:] != '.wav'):
-          file_path = os.path.join(dirname, filename)
-          os.remove(file_path)
-    
-    if (dataFileName != None):
-      dataFileName = dataFileName[:dataFileName.find('.')] + '.wav'
-    
-    # Load and extract audio
-    for dirname, _, filenames in os.walk(data_path):
-      for filename in filenames:
-        
-        if (filename == 'desktop.ini' or filename == 'desktop.in.txt' or filename == '.DS_Store' or filename == '.DS'):
-          continue
-        
-        if (dataFileName == None or filename == dataFileName):
-          # Load Audio and x
-          wav_path = os.path.join(dirname, filename)
-          audio = AudioSegment.from_file(wav_path)
-          # info = mediainfo(wav_path)
-          
-          if (audio.frame_rate != 16000):
-            audio = audio.set_frame_rate(16000)
-          if (audio.channels != 1):
-            audio = audio.set_channels(1)
-            
-          sr = audio.frame_rate
-          
-          audio = effects.normalize(audio, headroom = 5.0) # TODO: Try other head room
-          x = np.array(audio.get_array_of_samples(), dtype = 'float32')
-          # x = librosa.resample(x, orig_sr=audio.frame_rate, target_sr=16000)
-          
-          x_list.append(x)
-          sr_list.append(sr)
-          recording_names.append(filename)
+      sr = audio.frame_rate
+      
+      audio = effects.normalize(audio, headroom = 5.0) # TODO: Try other head room
+      x = np.array(audio.get_array_of_samples(), dtype = 'float32')
+      
+      x_list.append(x)
+      sr_list.append(sr)
+      recording_names.append(fileNameList[i])
     
     self.extractTestData(x_list, sr_list, recording_names)
   

@@ -4,7 +4,7 @@ import { useReactMediaRecorder } from 'react-media-recorder'
 import './RecordButton.css'
 
 
-export const RecordButton = (props) => {
+export const RecordButton = ({audioList, setRecordedAudio}) => {
 	const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ video: false });
 
 	useEffect(() => {
@@ -19,20 +19,20 @@ export const RecordButton = (props) => {
 															.replace(':', 'h')
 															.replace(':', 'm');
 
-				const className = fileName.replaceAll(' ', '-');
+				// const className = fileName.replaceAll(' ', '-');
 
 				const blob = await fetch(mediaBlobUrl).then(r => r.blob());
 				blob.name = fileName + ".wav";
-
 
 				const audioObject = {
 					blob: blob,
 					blobUrl: mediaBlobUrl,
 					fileName: fileName + ".wav",
-					className: className
+					className: audioList.length.toString()
 				}
-
-				props.setRecordedAudio(audioObject);
+				
+				setRecordedAudio(audioObject);
+				
 
 			}
 		}

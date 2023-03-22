@@ -26,6 +26,8 @@ export const SpeechEmotionRecognition = () => {
 	}
 
 	const storeFiles = (files) => {
+		const NUM_OF_STORED_FILES = audioList.length;
+
 		for (let i = 0; i < files.length; i++) {
 			const file = files[i];
 			// if (file.type != 'audio/wav' || file.type != 'audio/x-m4a' || file.type != 'audio/mpeg'  || file.type != 'audio/ogg')
@@ -38,17 +40,14 @@ export const SpeechEmotionRecognition = () => {
 				break;
 			}
 			else {
-				var blobUrl = (window.URL || window.webkitURL).createObjectURL(file);
-
-				let className = file.name.replaceAll(' ', '-');
-				console.log(className);
-				className = className.substring(0, className.indexOf('.'));
+				let blobUrl = (window.URL || window.webkitURL).createObjectURL(file);
+				let className = NUM_OF_STORED_FILES + i;
 
 				const audioObject = {
 					blob: file,
 					blobUrl: blobUrl,
 					fileName: file.name,
-					className: className
+					className: className.toString(),
 				}
 	
 				setAudioList(audioList => [...audioList, audioObject]);
@@ -67,12 +66,11 @@ export const SpeechEmotionRecognition = () => {
 		for (let i = 0; i < audioList.length; i++) {
 			const blob = audioList[i]['blob'];
 			const filename = audioList[i]['fileName'];
-			const filenameNoExtension = audioList[i]['className'];
+			const className = audioList[i]['className'];
 
 
-			formData.append(filenameNoExtension, blob, filename);
+			formData.append(className, blob, filename);
 		}
-		console.log(formData);
 
 		const response = await SERApi.getEmotionPrediction(formData);
 		if (response && response.data) {
@@ -140,7 +138,7 @@ export const SpeechEmotionRecognition = () => {
             {/* <div data-role="controls">
 							<button data-recording={status} onClick={(status === "recording") ? stopRecording : startRecording}>Record</button>
             </div> */}
-						<RecordButton setRecordedAudio={setRecordedAudio}></RecordButton>
+						<RecordButton audioList={audioList} setRecordedAudio={setRecordedAudio}></RecordButton>
           </div>
         </section>
         <section id="predict-button-section">
@@ -167,7 +165,7 @@ export const SpeechEmotionRecognition = () => {
 											{
 												(emotionResponseList)
 												? emotionResponseList.filter(emotionResponse => 
-														emotionResponse.name.substring(0, emotionResponse.name.indexOf('.')) === audio['fileName'].substring(0, audio['fileName'].indexOf('.'))
+														emotionResponse.name === audio['className']
 													).map((data) => {
 														let emotion = data.emotion;
 														// let name = data.name.replaceAll('.wav', '').replaceAll(' ', '-');
