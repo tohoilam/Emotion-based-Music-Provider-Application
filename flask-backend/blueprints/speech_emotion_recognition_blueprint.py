@@ -13,7 +13,7 @@ speech_emotion_recognition_blueprint = Blueprint('speech_emotion_recognition', _
 PATH_DIR_NAME = '/speech-emotion-recognition'
 
 MODEL_PATH = os.path.join('components', 'speech_emotion_recognition')
-MODEL_CONFIG_PATH = os.path.abspath(os.path.join('components', 'speech_emotion_recognitions', 'models.json'))
+MODEL_CONFIG_PATH = os.path.abspath(os.path.join('components', 'speech_emotion_recognition', 'models.json'))
 
 @speech_emotion_recognition_blueprint.errorhandler(413)
 def too_large(e):

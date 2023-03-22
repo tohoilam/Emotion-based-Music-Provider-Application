@@ -75,7 +75,6 @@ export const SpeechEmotionRecognition = () => {
 		const response = await SERApi.getEmotionPrediction(formData);
 		if (response && response.data) {
 			setEmotionResponseList(response.data);
-			console.log(response.data);
 		}
 
 		setIsLoading(false);
