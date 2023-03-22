@@ -7,6 +7,7 @@ import tensorflow as tf
 from flask import Flask, request, render_template
 from flask_cors import CORS, cross_origin
 
+
 # from components.speech_emotion_recognition.SERDataProcessing import SERDataProcessing
 # from HMMDataProcessing import HMMDataProcessing
 
@@ -18,9 +19,10 @@ app = Flask(__name__, static_folder="static")
 app.register_blueprint(music_generation_blueprint)
 app.register_blueprint(speech_emotion_recognition_blueprint)
 
+
 @app.errorhandler(413)
 def too_large(e):
-    return "File is too large", 413
+  return "File is too large", 413
 
 @app.route('/')
 @cross_origin()

@@ -71,6 +71,10 @@
 
 }
 
+#music-provider-section {
+  overflow-y: auto;
+}
+
 #recommend-board {
   width: 100%;
   padding: 20px;
