@@ -51,9 +51,13 @@ export const HomePage = () => {
               </label>
             </div>
           </div>
+          <div id="predict-box">
+            <div id="recommend-button">Recommend Music</div>
+            <div id="generate-button">Generate New Music</div>
+          </div>
         </section>
         <section id="music-provider-section">
-          <div id="recommend-board">
+          <div id="music-board">
             <iframe src="https://open.spotify.com/embed/track/43rA71bccXFGD4C8GOpIlN?si=1d29599053f34ff2" width="225" height="152" frameBorder="0"></iframe>
             <iframe src="https://open.spotify.com/embed/track/43rA71bccXFGD4C8GOpIlN?si=1d29599053f34ff2" width="225" height="152" frameBorder="0"></iframe>
             <iframe src="https://open.spotify.com/embed/track/43rA71bccXFGD4C8GOpIlN?si=1d29599053f34ff2" width="225" height="152" frameBorder="0"></iframe>

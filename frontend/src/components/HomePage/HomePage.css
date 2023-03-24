@@ -9,15 +9,39 @@
 }
 
 #home-page > header {
-  /* background-color: orange; */
   grid-row: 1 / span 1;
 }
 
 #home-page #demos-menu {
-  /* background-color: yellow; */
   grid-row: 2 / span 1;
   height: 100%;
 }
+
+#home-page #EBMP-main {
+  grid-row: 3 / span 1;
+  display: grid;
+  grid-template-columns: 25% 75%;
+}
+
+#home-page #contols-section {
+  grid-column: 1 / span 1;
+}
+
+#home-page #music-provider-section {
+  grid-column: 2 / span 1;
+}
+
+#home-page #footer-section {
+  grid-row: 4 / span 1;
+}
+
+
+
+/* **************************************************************************** */
+/* **************************************************************************** */
+/* ***************************** B). Menu Section ***************************** */
+/* **************************************************************************** */
+/* **************************************************************************** */
 
 #home-page #demos-menu > ul {
   display: flex;
@@ -39,67 +63,6 @@
   text-decoration: none;
 }
 
-#home-page #EBMP-main {
-  grid-row: 3 / span 1;
-  display: grid;
-  grid-template-columns: 25% 75%;
-  margin: 0px 30px;
-  background-color: rgb(58, 90, 78);
-  border-radius: 30px;
-}
-
-#home-page #contols-section {
-  grid-column: 1 / span 1;
-}
-
-#home-page #music-provider-section {
-  grid-column: 2 / span 1;
-  background-color: rgb(31, 54, 49);
-  border-radius: 30px;
-}
-
-#home-page #footer-section {
-  /* background-color: green; */
-  grid-row: 4 / span 1;
-}
-
-
-#record-button-container {
-  width: 160px;
-  margin: auto;
-  margin-top: 50px;
-
-}
-
-#music-provider-section {
-  overflow-y: auto;
-}
-
-#recommend-board {
-  width: 100%;
-  padding: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-
-  justify-content: space-around;
-}
-
-
-#genre-selection {
-  box-sizing: border-box;
-
-  margin: 20px 10px 20px 10px;
-  width: calc(100% - 20px);
-}
-
-.switch-box {
-  display: flex;
-  justify-content: space-around;
-  align-content: center;
-}
-
-
 .menu-item {
   color: rgb(154, 193, 183);
   margin-top: auto;
@@ -109,4 +72,66 @@
 .menu-item:hover {
   color: rgb(201, 234, 226);
   font-weight: bold;
+}
+
+
+
+/* **************************************************************************** */
+/* **************************************************************************** */
+/* ***************************** C). Main Section ***************************** */
+/* **************************************************************************** */
+/* **************************************************************************** */
+
+#home-page #EBMP-main {
+  margin: 0px 30px;
+  background-color: rgb(58, 90, 78);
+  border-radius: 30px;
+}
+
+
+
+/* ******************************************************************************** */
+/* ******************************************************************************** */
+/* ***************************** C1). Control Section ***************************** */
+/* ******************************************************************************** */
+/* ******************************************************************************** */
+
+#home-page #record-button-container {
+  width: 160px;
+  margin: auto;
+  margin-top: 50px;
+}
+
+#home-page #genre-selection {
+  box-sizing: border-box;
+  margin: 20px 10px 20px 10px;
+  width: calc(100% - 20px);
+}
+
+#home-page .switch-box {
+  display: flex;
+  justify-content: space-around;
+  align-content: center;
+}
+
+
+
+/* ************************************************************************************ */
+/* ************************************************************************************ */
+/* ***************************** C1). Music Board Section ***************************** */
+/* ************************************************************************************ */
+/* ************************************************************************************ */
+#home-page #music-provider-section {
+  background-color: rgb(31, 54, 49);
+  border-radius: 30px;
+  overflow-y: auto;
+}
+
+#home-page #music-board {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-around;
 }
