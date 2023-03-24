@@ -30,8 +30,9 @@ def generateMusic(bundle_path: str,
   if (not os.path.isabs(bundle_path)):
     bundle_path = os.path.abspath(bundle_path)
   
-  if (not os.path.isabs(primer_path)):
-    primer_path = os.path.abspath(primer_path)
+  if (primer_path):
+    if (not os.path.isabs(primer_path)):
+      primer_path = os.path.abspath(primer_path)
 
   sequence_generator_available_option = ["melody_rnn"]
   if (sequence_generator_option not in sequence_generator_available_option):

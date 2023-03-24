@@ -29,9 +29,13 @@ def too_large(e):
 @music_generation_blueprint.route(PATH_DIR_NAME + '/generate', methods=['POST'])
 @cross_origin()
 def generate():
-  result = SER_Predict_Full(request)
-  speech_emotion = result.data[0]
+  modelChoice = 1 # Final Model
+  result = SER_Predict_Full(request, fixed_model_choice=modelChoice)
+  print(result)
+  speech_emotion = result['data'][0]
   emotion = speech_emotion['emotion']
+
+  print(f"Emotion: {emotion}")
 
   primer_folder = os.path.abspath(os.path.join(PRIMERS_MIDI_PATHS, emotion))
   primer_pos = random.randint(0, PRIMER_COUNT - 1)
@@ -53,13 +57,13 @@ def generate():
       break
 
   primer_path = os.path.join(primer_folder, primer_filename)
-
+  print(f"Primer path: {primer_path}")
 
   attention_sequence = generateMusic(
     MODEL_PATH,
     "melody_rnn",
     "attention_rnn",
-    primer_path=primer_path,
+    # primer_path=primer_path,
     total_length_steps=70,
     temperature=1
   )
@@ -69,7 +73,7 @@ def generate():
   scaled = np.int16(waveform / np.max(np.abs(waveform)) * 32767)
   filepath = os.path.join(WAV_SAVE_PATH, 'test.wav')
   write(filepath, SAMPLING_RATE, scaled)
-  return send_file(filepath)
+  return send_file(filepath, as_attachment=True, mimetype='audio/wav')
 
 
 

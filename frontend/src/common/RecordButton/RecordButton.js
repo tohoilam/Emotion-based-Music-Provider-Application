@@ -28,7 +28,7 @@ export const RecordButton = ({audioList, setRecordedAudio}) => {
 					blob: blob,
 					blobUrl: mediaBlobUrl,
 					fileName: fileName + ".wav",
-					className: audioList.length.toString()
+					className: (audioList) ? audioList.length.toString() : "0"
 				}
 				
 				setRecordedAudio(audioObject);

@@ -114,6 +114,43 @@
   align-content: center;
 }
 
+#home-page #predict-box {
+  display: flex;
+
+}
+
+#home-page #predict-box > button {
+  background-color: #3c85b6;
+  width: 250px;
+  height: 60px;
+  border-radius: 20px;
+  border: 1px solid #04273e;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #04273e;
+  cursor: pointer;
+}
+
+#home-page #predict-box > button:hover {
+  background-color: #4d97c7;
+}
+
+#home-page #predict-box > button:active {
+  background-color: #91cdf6;
+}
+
+#home-page #predicted-emotion {
+  background-color: #3c85b6;
+  width: 250px;
+  height: 60px;
+  border-radius: 20px;
+  border: 1px solid #04273e;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #04273e;
+  cursor: pointer;
+}
+
 
 
 /* ************************************************************************************ */

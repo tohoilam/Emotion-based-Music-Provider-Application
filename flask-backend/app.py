@@ -13,11 +13,13 @@ from flask_cors import CORS, cross_origin
 
 from blueprints.music_generation_blueprint import music_generation_blueprint
 from blueprints.speech_emotion_recognition_blueprint import speech_emotion_recognition_blueprint
+from blueprints.music_recommendation_blueprint import music_recommendation_blueprint
 
 app = Flask(__name__, static_folder="static")
 
 app.register_blueprint(music_generation_blueprint)
 app.register_blueprint(speech_emotion_recognition_blueprint)
+app.register_blueprint(music_recommendation_blueprint)
 
 
 @app.errorhandler(413)

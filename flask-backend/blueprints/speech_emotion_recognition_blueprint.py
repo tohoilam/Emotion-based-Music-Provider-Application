@@ -47,8 +47,8 @@ def predict():
   return SER_Predict(request)
 
 
-def SER_Predict_Full(api_request):
-  result = SER_Predict(api_request)
+def SER_Predict_Full(api_request, fixed_model_choice=None):
+  result = SER_Predict(api_request, fixed_model_choice=fixed_model_choice)
   separated_predicted_list = result['data']
   packed_predicted_list = []
 
@@ -96,7 +96,7 @@ def SER_Predict_Full(api_request):
   
   return {'data': packed_predicted_list, 'status': 'ok', 'errMsg': ''}
 
-def SER_Predict(api_request):
+def SER_Predict(api_request, fixed_model_choice=None):
   print('Speech Emotion Recognition Predict')
   # 1). Get model config
   modelListConfig = getModelConfig()
@@ -107,10 +107,15 @@ def SER_Predict(api_request):
 
     
   # 2). Check if model choice parameter is passed correctly
-  if ('modelChoice' not in api_request.form or api_request.form['modelChoice'] == 'null'):
-    errMsg = 'Model is not selected! Please select a model from dropdown!'
-    print('Failed: ' + errMsg)
-    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+  if (fixed_model_choice == None):
+    if ('modelChoice' not in api_request.form or api_request.form['modelChoice'] == 'null'):
+      errMsg = 'Model is not selected! Please select a model from dropdown!'
+      print('Failed: ' + errMsg)
+      return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+    
+    modelChoice = int(api_request.form['modelChoice'])
+  else:
+    modelChoice = fixed_model_choice
   
   # 3). Pack audio files
   fileList = []
@@ -127,7 +132,6 @@ def SER_Predict(api_request):
     return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
 
   # 4). A: Get Model Choice and Configure Model; B: Load and Process data
-  modelChoice = int(api_request.form['modelChoice'])
   if (modelListConfig != None):
     status, res = getModelAndData(modelChoice, modelListConfig, fileList, filenameList)
     if (status != 'ok'):
