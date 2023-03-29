@@ -1,6 +1,10 @@
 import os
+import io
+import json
 import random
+import zipfile
 import numpy as np
+import base64
 from flask import request
 from flask import Blueprint, send_file
 from flask_cors import cross_origin
@@ -8,7 +12,7 @@ from blueprints.speech_emotion_recognition_blueprint import getModelConfig, SER_
 from components.music_generation.generate_music import generateMusic
 import magenta.music as mm
 from pretty_midi import PrettyMIDI
-from scipy.io.wavfile import write
+from scipy.io.wavfile import write, read
 
 
 
@@ -59,21 +63,43 @@ def generate():
   primer_path = os.path.join(primer_folder, primer_filename)
   print(f"Primer path: {primer_path}")
 
-  attention_sequence = generateMusic(
-    MODEL_PATH,
-    "melody_rnn",
-    "attention_rnn",
-    # primer_path=primer_path,
-    total_length_steps=70,
-    temperature=1
-  )
+  audio_list = []
+  for i in range(2):
+    attention_sequence = generateMusic(
+      MODEL_PATH,
+      "melody_rnn",
+      "attention_rnn",
+      # primer_path=primer_path,
+      total_length_steps=70,
+      temperature=1
+    )
 
-  attention_pretty_midi = mm.midi_io.note_sequence_to_pretty_midi(attention_sequence)
-  waveform = attention_pretty_midi.fluidsynth(fs=SAMPLING_RATE)
-  scaled = np.int16(waveform / np.max(np.abs(waveform)) * 32767)
-  filepath = os.path.join(WAV_SAVE_PATH, 'test.wav')
-  write(filepath, SAMPLING_RATE, scaled)
-  return send_file(filepath, as_attachment=True, mimetype='audio/wav')
+    attention_pretty_midi = mm.midi_io.note_sequence_to_pretty_midi(attention_sequence)
+    waveform = attention_pretty_midi.fluidsynth(fs=SAMPLING_RATE)
+    scaled = np.int16(waveform / np.max(np.abs(waveform)) * 32767)
+    # Create a BytesIO object to hold the binary data
+    wavBuffer = io.BytesIO()
+    write(wavBuffer, SAMPLING_RATE, scaled)
+    binary_data = wavBuffer.getvalue()
+    audio_list.append(binary_data)
 
+  info = {
+    'speech': {
+      'emotion': speech_emotion['emotion'],
+      'percentage': speech_emotion['percentage']
+    }
+  }
 
+  json_bytes = json.dumps(info).encode('utf-8')
+  
 
+  zip_buffer = io.BytesIO()
+  with zipfile.ZipFile(zip_buffer, mode='w') as zip_file:
+    for pos, audio in enumerate(audio_list):
+      zip_file.writestr(f'generated{pos}.wav', audio)
+    
+    zip_file.writestr('info.json', json_bytes)
+  
+  zip_buffer.seek(0)
+  
+  return send_file(zip_buffer, as_attachment=True, download_name='audio_files.zip', mimetype='application/zip')

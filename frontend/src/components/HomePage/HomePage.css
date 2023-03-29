@@ -172,3 +172,132 @@
   gap: 20px;
   justify-content: space-around;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#loading {
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  z-index: 10000;
+  background-color: rgba(0, 0, 0, 0.571);
+}
+
+#loader {
+  border: 5px solid #f3f3f3; /* Light grey */
+  border-top: 5px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  margin: auto;
+  margin-top: 45vh;
+  animation: spin 0.7s linear infinite;
+}
+
+.not-loading {
+  left: -100%;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ***************************************************************************** */
+/* ***************************************************************************** */
+/* ************************** B). File Upload Section ************************** */
+/* ***************************************************************************** */
+/* ***************************************************************************** */
+#file-upload {
+  width: 100%;
+  padding: 5px;
+  /* background: #6fe1f5; */
+  border-radius: 5px;
+}
+
+#file-upload #upload-form {
+  height: 167px;
+  display: flex;
+  margin: 20px 0px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 5px;
+  border: 2px dashed #3c85b6;
+}
+
+#file-upload #upload-form i {
+  font-size: 50px;
+  color: #3c85b6;
+}
+
+#file-upload #upload-form p {
+  font-size: 16px;
+  margin-top: 15px;
+  color: #3c85b6;
+}
+
+#file-upload #upload-form[drop-active=true] {
+  border: 2px dashed #8bcbf6;
+}
+
+#file-upload #upload-form[drop-active=true] i {
+  color: #8bcbf6;
+}
+
+#file-upload #upload-form[drop-active=true] p {
+  color: #8bcbf6;
+}
+
+#file-input {
+  position: absolute;
+  left: -100%;
+}

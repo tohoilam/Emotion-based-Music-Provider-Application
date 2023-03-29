@@ -13,8 +13,8 @@
   },
   {
     "name": "Final Model (CNN-LSTM)",
-    "folderName": "BestCnnLstmModel.h5",
-    "labelsToInclude": ["Anger", "Frustration", "Happiness", "Neutral", "Sadness"],
+    "folderName": "FinalModel.h5",
+    "labelsToInclude": ["Anger", "Happiness", "Calmness", "Sadness"],
     "splitDuration": 8,
     "ignoreDuration": 2,
     "transformByStft": true,

@@ -30,23 +30,17 @@ def getSongs():
 
   anger = emotion_percentages['Anger']
   happiness = emotion_percentages['Happiness']
-  neutral = emotion_percentages['Neutral']
+  calmness = emotion_percentages['Calmness']
   sadness = emotion_percentages['Sadness']
 
-  total = anger + happiness + neutral + sadness
-  anger /= total
-  happiness /= total
-  neutral /= total
-  sadness /= total
-
-  songList = getSongList(SONGS_JSON_PATH, happiness, neutral, anger, sadness, output_no=10)
+  songList = getSongList(SONGS_JSON_PATH, happiness, calmness, anger, sadness, output_no=20)
 
   returnData = {
     "emotion": speech_emotion['emotion'],
     "percentage": {
       "Anger" : anger,
       "Happiness": happiness,
-      "Neutral": neutral,
+      "Calmness": calmness,
       "Sadness": sadness
     },
     "song_list": songList
@@ -58,7 +52,7 @@ def getSongs():
 @cross_origin()
 def getSongsTesting():
 
-  songList = getSongList(SONGS_JSON_PATH, 0.1, 0.1, 0.7, 0.1, output_no=10)
+  songList = getSongList(SONGS_JSON_PATH, 0.1, 0.1, 0.7, 0.1, output_no=30)
 
   print(songList)
   return songList

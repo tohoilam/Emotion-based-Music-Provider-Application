@@ -14,7 +14,7 @@ const getMusicRecommendation = async (formData) => {
 		processData: false,
 	})
 	.done((response) => {
-		if (response && response.data && response.data.length > 0) {
+		if (response && response.data) {
       return response.data;
 		}
 
