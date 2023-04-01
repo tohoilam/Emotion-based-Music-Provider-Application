@@ -1,226 +1,159 @@
 import React, { useEffect, useState, useRef } from 'react'
 
 import { RecordButton } from '../../common/RecordButton/RecordButton'
+import { HomeMusicRecommendation } from './HomeMusicRecommendation'
+
 import MGApi from '../../routes/MGApi'
 import MRApi from '../../routes/MRApi'
 
 import './HomePage.css'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box';
-import Tab from '@mui/material/Tab';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
+import { ThemeProvider, Container, Typography, Paper, Box, Tab, Button, Grid, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
+import { useTheme } from '@mui/material/styles';
+
+import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 export const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [recordedAudio, setRecordedAudio] = useState(null);
-  const [withText, setWithText] = useState(true);
-  const [recommendedMusic, setRecommendedMusic] = useState([]);
-  const [emotion, setEmotion] = useState("");
-  const [emotionPercentage, setEmotionPercentage] = useState(null);
   const [generatedAudioList, setGeneratedAudioList] = useState([]);
+  const [expandedInfo, setExpandedInfo] = useState(false);
   const [tab, setTab] = React.useState('1');
 
-	const [dropActive, setDropActive] = useState([]);
-	const audioFileInputRef= useRef(null);
+  const infoRef = useRef(null);
 
-
+  // const theme = useTheme();
+  const theme = useTheme();
+  // const theme = createTheme({
+  //   overrides: {
+  //     MuiAccordionSummary: {
+  //       content: {
+  //         margin: 0,
+  //       },
+  //     },
+  //   },
+  // });
+  
 
   const handleChange = (event, newValue) => {
     setTab(newValue);
   };
 
-  const dropFiles = (e) => {
-		e.preventDefault();
-		e.stopPropagation();
 
-		setDropActive(false);
-		storeFiles(e.dataTransfer.files)
-	}
+  // const generateMusic = async () => {
+  //   setIsLoading(true);
+  //   let formData = new FormData();
+  //   formData.append(recordedAudio['className'], recordedAudio['blob'], recordedAudio['fileName']);
 
-	const storeFiles = (files) => {
+  //   const response = await MGApi.getMusicGeneration(formData);
+	// 	if (response) {
+  //     const blobUrlList = response.blobUrlList;
+  //     const infoData = response.infoData;
 
-    setIsLoading(true);
-    const file = files[0];
-    // if (file.type != 'audio/wav' || file.type != 'audio/x-m4a' || file.type != 'audio/mpeg'  || file.type != 'audio/ogg')
-    if (file.type !== 'audio/wav' && file.type !== 'audio/x-m4a'
-      && file.type !== 'audio/mpeg' && file.type !== 'audio/ogg'
-      && file.type !== 'audio/basic') {
-      
-      const errMsg = "Please only upload .wav, .m4a, .mp3, .ogg, .opus, or .au file type!";
-      alert(errMsg);
-    }
-    else {
-      let blobUrl = (window.URL || window.webkitURL).createObjectURL(file);
+	// 		setGeneratedAudioList(blobUrlList);
+	// 	}
 
-      const audioObject = {
-        blob: file,
-        blobUrl: blobUrl,
-        fileName: file.name,
-        className: "0",
-      }
-
-      setRecordedAudio(audioObject);
-    }
-
-    setIsLoading(false);
-
-	}
-
-  const recommendMusic = async () => {
-    setIsLoading(true);
-    let formData = new FormData();
-    formData.append(recordedAudio['className'], recordedAudio['blob'], recordedAudio['fileName']);
-
-    const response = await MRApi.getMusicRecommendation(formData);
-    console.log(response);
-    const resEmotion = response['data']['emotion'];
-    const percentage = response['data']['percentage'];
-    const songList = response['data']['song_list'];
-
-    setRecommendedMusic(songList);
-    setEmotion(resEmotion);
-    setEmotionPercentage([percentage['Anger'],percentage['Happiness'], percentage['Neutral'], percentage['Sadness']]);
-    setIsLoading(false);
-  }
-
-  const generateMusic = async () => {
-    setIsLoading(true);
-    let formData = new FormData();
-    formData.append(recordedAudio['className'], recordedAudio['blob'], recordedAudio['fileName']);
-
-    const response = await MGApi.getMusicGeneration(formData);
-		if (response) {
-      const blobUrlList = response.blobUrlList;
-      const infoData = response.infoData;
-
-			setGeneratedAudioList(blobUrlList);
-		}
-
-		setIsLoading(false);
-  }
-
-  useEffect(() => {
-    if (recordedAudio) {
-      console.log(recordedAudio);
-    }
-  }, [recordedAudio]);
-
-  useEffect(() => {
-    console.log(withText)
-  }, [withText]);
-
+	// 	setIsLoading(false);
+  // }
 
   return (
-    <div id="home-page">
-      <header>Emotion-based Music Provider</header>
-      <nav id="demos-menu">
-        <ul>
-          <li><a className="menu-item" href='/speech-emotion-recognition'>Speech Emotion Recognition</a></li>
-          <li><a className="menu-item" href='/music-emotion-classification'>Music Emotion Classification</a></li>
-          <li><a className="menu-item" href='/lyrics-emotion-classification'>Lyrics Emotion Classification</a></li>
-          <li><a className="menu-item" href='/music-generation'>Music Generation</a></li>
-          <li><a className="menu-item" href='/music-recommendation'>Music Recommendation (Mapping)</a></li>
-        </ul>
-      </nav>
-      <section id="EBMP-main">
-        <TabContext value={tab}>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <TabList onChange={handleChange} aria-label="lab API tabs example">
-              <Tab label="Music Recommendation" value="1" />
-              <Tab label="Music Generation" value="2" />
+    <ThemeProvider theme={theme}>
+    <TabContext id="home-page" value={tab}>
+      <Grid container sx={{ height: "100vh"}} direction="column" justifyContent="center" alignItems="stretch" wrap='nowrap'>
+        <Grid item xs={1}>
+          <Typography
+            variant="h1"
+            sx={{ height: "10%", textAlign: "center"}}
+          >
+            Emotion-based Music Provider
+          </Typography>
+        </Grid>
+        <Grid item xs={1}>
+          {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}> */}
+            <TabList onChange={handleChange} aria-label="lab API tabs example" centered >
+              <Tab sx={{ height: "10px", py: "0px"}} label="Music Recommendation" value="1" />
+              <Tab sx={{ height: "10px", py: "0px"}} label="Music Generation" value="2" />
             </TabList>
-          </Box>
-          <TabPanel value="1">Item One</TabPanel>
-          <TabPanel value="2">Item Two</TabPanel>
-        </TabContext>
-        <section id="contols-section">
-          <div id="record-button-container">
-            <RecordButton setRecordedAudio={setRecordedAudio}></RecordButton>
-          </div>
-          <section id="file-upload">
-            <h1 className="file-upload-header">File Upload</h1>
-            <form id="upload-form" action="#" drop-active={dropActive.toString()}
-                      onClick={() => {audioFileInputRef.current.click()}}
-                      onDragOver={(e) => {e.preventDefault();e.stopPropagation();setDropActive(true)}}
-                      onDragLeave={() => {setDropActive(false)}}
-                      onDrop={(e) => {dropFiles(e)}}>
-              <i className="fas fa-cloud-upload-alt"></i>
-              <p>Browse File to Upload</p>
-            </form>
-            <input type="file" id="file-input" onChange={(e) => storeFiles(e.target.files)} ref={audioFileInputRef} multiple />
-          </section>
-          <select name="genre-selection" id="genre-selection" defaultValue={1} >
-            <option disabled value> -- select a genre -- </option>
-            <option key='pop' value='pop'>Pop</option>
-            <option key='rnb' value='rnb'>R&B</option>
-          </select>
-          <div id="mode-toggle-box" >
-            <h2 id="mode-header">Language</h2>
-            <div className="switch-box">
-              <div className="switch-label">English</div>
-              <label className="switch">
-                <input type="checkbox" defaultChecked={true} onChange={() => {setWithText(!withText)}} />
-                <span className="slider round"></span>
-              </label>
-            </div>
-          </div>
-          <div id="predict-box">
-            <button id="recommend-button" onClick={recommendMusic}>Recommend Music</button>
-            <button id="generate-button" onClick={generateMusic}>Generate New Music</button>
-          </div>
-          {
-            (emotion)
-            ? <div id="predicted-emotion">{emotion}</div>
-            : ""
-          }
-          {
-            (emotionPercentage)
-            ? <div id="predicted-emotion-percentage">{emotionPercentage}</div>
-            : ""
-          }
-        </section>
-        <section id="music-provider-section">
-          <div id="music-board">
-            {
-              (recommendedMusic !== [])
-              ? recommendedMusic.map((music) => {
-
-                return (
-                  <iframe title={music[0]} src={"https://open.spotify.com/embed/track/" + music[0]} width="225" height="152" frameBorder="0"></iframe>
-                )
-              })
-              : ""
-            }
-            {
-              (generatedAudioList !== [])
-              ? generatedAudioList.map(generatedAudio => {
-                  return (
-                    <div>
-                      <audio src={generatedAudio} id="generated-audio" controls></audio>
-                      <a href={generatedAudio} download="test.wav">Download</a>
-                    </div>
-                  )
-              })
+          {/* </Box> */}
+        </Grid>
+        <Grid item xs={10} sx={{ height: "80%"}} >
+          <Container id="tabs" maxWidth="1600px" sx={{height: "100%", width: "100%" }}>
+            <TabPanel value="1" sx={{height: "95%"}}>
+              <HomeMusicRecommendation setIsLoading={setIsLoading} setExpandedInfo={setExpandedInfo} ></HomeMusicRecommendation>
+              {/* <Box ref={infoRef} sx={{height: (expandedInfo) ? "100%" : "5%"}}>
+                <Paper sx={{height: "100%", mt: 3, bgcolor: theme.palette.secondary.main, borderRadius: "12px" }}></Paper>
+              </Box> */}
+              <Paper sx={{ bgcolor: theme.palette.secondary.main, borderRadius: "12px", mt: 3}}>
+                <Accordion expanded={expandedInfo} square sx={{height: "100%", bgcolor: "rgba(0,0,0,0)"}}>
+                  <AccordionSummary
+                    sx={{borderRadius: "12px"}}
+                    // expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography sx={{ textAlign: "center", width: "100%"}}>More Info</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography>
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              </Paper>
               
-              : ""
-            }
-          </div>
-        </section>
-      </section>
+            </TabPanel>
+            <TabPanel value="2">Item Two</TabPanel>
+          </Container>
+        </Grid>
+      </Grid>
+    </TabContext>
+    </ThemeProvider>
 
-      <section id="footer-section"></section>
-      {
-        (isLoading === true)
-        ? <div id="loading">
-            <div id="loader"></div>
-          </div>
-        : <div id="loading" className='not-loading'>
-            <div id="loader"></div>
-          </div>
-      }
-      
-    </div>
-  )
+  );
+
+  // return (
+  //   <TabContext id="home-page" value={tab}>
+  //     <header>Emotion-based Music Provider</header>
+  //     <section id="EBMP-main">
+  //       <Box id="tabsMenu" sx={{ borderBottom: 1, borderColor: 'divider' }}>
+  //         <TabList onChange={handleChange} aria-label="lab API tabs example" centered>
+  //           <Tab label="Music Recommendation" value="1" />
+  //           <Tab label="Music Generation" value="2" />
+  //         </TabList>
+  //       </Box>
+  //       <div id="tabs">
+  //         <TabPanel value="1">
+  //           <HomeMusicRecommendation setIsLoading={setIsLoading} ></HomeMusicRecommendation>
+  //         </TabPanel>
+  //         <TabPanel value="2">Item Two</TabPanel>
+  //       </div>
+        
+  //     </section>
+
+  //     {
+  //       (isLoading === true)
+  //       ? <div id="loading">
+  //           <div id="loader"></div>
+  //         </div>
+  //       : <div id="loading" className='not-loading'>
+  //           <div id="loader"></div>
+  //         </div>
+  //     }
+  //   </TabContext>
+  // );
 }

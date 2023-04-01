@@ -1,11 +1,17 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useReactMediaRecorder } from 'react-media-recorder'
 
 import './RecordButton.css'
 
 
-export const RecordButton = ({audioList, setRecordedAudio}) => {
+export const RecordButton = ({audioList, setRecordedAudio, diameter="100%"}) => {
+	const [width, setWidth] = useState("100%");
+
 	const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ video: false });
+
+	useEffect(() => {
+		setWidth(diameter);
+	}, []);
 
 	useEffect(() => {
 		const prepareRecording = async () => {
@@ -43,7 +49,7 @@ export const RecordButton = ({audioList, setRecordedAudio}) => {
 	}, [status])
 
   return (
-    <div data-role="controls" className='record-box'>
+    <div data-role="controls" className='record-box' style={{width: width}}>
       <button data-recording={status} onClick={(status === "recording") ? stopRecording : startRecording}>Record</button>
     </div>
   )
