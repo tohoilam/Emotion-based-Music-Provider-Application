@@ -5,7 +5,7 @@ import { RecordButton } from '../../common/RecordButton/RecordButton'
 
 import MRApi from '../../routes/MRApi'
 
-export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo}) => {
+export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay}) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
@@ -59,6 +59,7 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo}) => {
 	}
 
   const moreInfo = (music) => {
+    setMusicInfoToDisplay(music);
     setExpandedInfo(true);
   }
 
@@ -194,7 +195,7 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo}) => {
 
                 return (
                   // <iframe title={music[0]} src={"https://open.spotify.com/embed/track/" + music[0]} width="225" height="152" frameBorder="0"></iframe>
-                  <Grid item xs={12} sm={6} md={4} >
+                  <Grid key={music[0]} item xs={12} sm={6} md={4} >
                     <Card sx={{bgcolor: "rgb(183, 29, 30)", p: 1, borderRadius: "10px"}}>
                       <Grid
                         container
@@ -214,7 +215,7 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo}) => {
                           </Typography>
                         </Grid>
                         <Grid item xs={6} >
-                          <Button variant="contained" sx={{width: "100%"}} onClick={(e) => moreInfo(e.target)} >
+                          <Button variant="contained" sx={{width: "100%"}} onClick={(e) => moreInfo(music)} >
                             More
                           </Button>
                         </Grid>

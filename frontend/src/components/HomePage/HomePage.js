@@ -16,6 +16,7 @@ export const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedAudioList, setGeneratedAudioList] = useState([]);
   const [expandedInfo, setExpandedInfo] = useState(false);
+  const [musicInfoToDisplay, setMusicInfoToDisplay] = useState(null);
   const [tab, setTab] = React.useState('1');
 
   const infoRef = useRef(null);
@@ -77,7 +78,7 @@ export const HomePage = () => {
         <Grid item xs={10} sx={{ height: "80%"}} >
           <Container id="tabs" maxWidth="1600px" sx={{height: "100%", width: "100%" }}>
             <TabPanel value="1" sx={{height: "95%"}}>
-              <HomeMusicRecommendation setIsLoading={setIsLoading} setExpandedInfo={setExpandedInfo} ></HomeMusicRecommendation>
+              <HomeMusicRecommendation setIsLoading={setIsLoading} setExpandedInfo={setExpandedInfo} setMusicInfoToDisplay={setMusicInfoToDisplay} ></HomeMusicRecommendation>
               {/* <Box ref={infoRef} sx={{height: (expandedInfo) ? "100%" : "5%"}}>
                 <Paper sx={{height: "100%", mt: 3, bgcolor: theme.palette.secondary.main, borderRadius: "12px" }}></Paper>
               </Box> */}
@@ -93,24 +94,11 @@ export const HomePage = () => {
                   </AccordionSummary>
                   <AccordionDetails>
                     <Typography>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                      malesuada lacus ex, sit amet blandit leo lobortis eget.
+                      {
+                        (musicInfoToDisplay)
+                        ? JSON.stringify(musicInfoToDisplay)
+                        : ""
+                      }
                     </Typography>
                   </AccordionDetails>
                 </Accordion>
