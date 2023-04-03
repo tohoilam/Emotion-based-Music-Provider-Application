@@ -7,6 +7,7 @@ from flask import Blueprint
 from flask_cors import cross_origin
 
 from components.speech_emotion_recognition.SERDataProcessing import SERDataProcessing
+from components.speech_emotion_recognition.TECRNN import evaluateTextInSpeech
 
 speech_emotion_recognition_blueprint = Blueprint('speech_emotion_recognition', __name__)
 
@@ -45,6 +46,12 @@ def models():
 @cross_origin()
 def predict():
   return SER_Predict(request)
+
+
+@speech_emotion_recognition_blueprint.route(PATH_DIR_NAME + '/predict-by-text', methods=['POST'])
+@cross_origin()
+def predictByText():
+  return Text_Predict(request)
 
 
 def SER_Predict_Full(api_request, fixed_model_choice=None):
@@ -169,6 +176,44 @@ def SER_Predict(api_request, fixed_model_choice=None):
     })  
   
   return {'data': predicted_data_list, 'status': 'ok', 'errMsg': ''}
+
+def Text_Predict(api_request):
+  print('Text Emotion Recognition Predict')
+
+  modelDir = os.path.join(os.getcwd(), MODEL_PATH, 'TECRNN')
+
+  # 1). Pack audio files
+  fileList = []
+  filenameList = []
+
+  if (len(api_request.files) != 0):
+    for filename in api_request.files:
+      file = api_request.files[filename]
+      fileList.append(file)
+      filenameList.append(filename)
+  else:
+    warnMsg = 'No audio data to predict.'
+    print('Warning: ' + warnMsg)
+    return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+  
+  textEmotionList = []
+  for pos, audio_file in enumerate(fileList):
+    filename = filenameList[pos]
+
+    result = evaluateTextInSpeech(audio_file, modelDir)
+
+    if (result and result['success']):
+      textEmotionList.append({
+        "percentage": result['percentage'],
+        "text": result['text'],
+        "filename": filename
+      })
+    else:
+      warnMsg = result['error']
+      print('Warning: ' + warnMsg)
+      return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+  
+  return {'data': textEmotionList, 'status': 'ok', 'errMsg': ''}
 
 
 def getModelAndData(modelChoice, modelListConfig, fileList, dataFileName):

@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react'
+// import { useMode } from '../../theme'
 
 import { RecordButton } from '../../common/RecordButton/RecordButton'
 import { HomeMusicRecommendation } from './HomeMusicRecommendation'
+import { MusicRecommendationInfo } from '../Info/MusicRecommendationInfo'
+import DonutChart from '../../common/Charts/DonutChart'
+
 
 import MGApi from '../../routes/MGApi'
 import MRApi from '../../routes/MRApi'
@@ -15,12 +19,15 @@ import { TabContext, TabList, TabPanel } from '@mui/lab'
 export const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedAudioList, setGeneratedAudioList] = useState([]);
-  const [expandedInfo, setExpandedInfo] = useState(false);
+  const [expandedInfo, setExpandedInfo] = useState(true);
   const [musicInfoToDisplay, setMusicInfoToDisplay] = useState(null);
+  const [speechInfo, setSpeechInfo] = useState(null);
+  const [recommendMode, setRecommendMode] = useState('audio');
   const [tab, setTab] = React.useState('1');
 
   const infoRef = useRef(null);
 
+  // const theme = useTheme();
   // const theme = useTheme();
   const theme = useTheme();
   // const theme = createTheme({
@@ -37,6 +44,10 @@ export const HomePage = () => {
   const handleChange = (event, newValue) => {
     setTab(newValue);
   };
+
+  useEffect(() => {
+    console.log(musicInfoToDisplay);
+  }, [musicInfoToDisplay]);
 
 
   // const generateMusic = async () => {
@@ -78,14 +89,22 @@ export const HomePage = () => {
         <Grid item xs={10} sx={{ height: "80%"}} >
           <Container id="tabs" maxWidth="1600px" sx={{height: "100%", width: "100%" }}>
             <TabPanel value="1" sx={{height: "95%"}}>
-              <HomeMusicRecommendation setIsLoading={setIsLoading} setExpandedInfo={setExpandedInfo} setMusicInfoToDisplay={setMusicInfoToDisplay} ></HomeMusicRecommendation>
+              <HomeMusicRecommendation
+                  setIsLoading={setIsLoading}
+                  setExpandedInfo={setExpandedInfo}
+                  setMusicInfoToDisplay={setMusicInfoToDisplay}
+                  setSpeechInfo={setSpeechInfo}
+                  speechInfo={speechInfo}
+                  selectedMode={recommendMode}
+                  setSelectedMode={setRecommendMode}
+              ></HomeMusicRecommendation>
               {/* <Box ref={infoRef} sx={{height: (expandedInfo) ? "100%" : "5%"}}>
                 <Paper sx={{height: "100%", mt: 3, bgcolor: theme.palette.secondary.main, borderRadius: "12px" }}></Paper>
               </Box> */}
-              <Paper sx={{ bgcolor: theme.palette.secondary.main, borderRadius: "12px", mt: 3}}>
-                <Accordion expanded={expandedInfo} square sx={{height: "100%", bgcolor: "rgba(0,0,0,0)"}}>
+              <Paper sx={{ bgcolor: theme.palette.secondary.main, borderRadius: "6px", mt: 3, backgroundImage: "none", border: "1px solid rgba(255, 255, 255, 0.12)"}}>
+                <Accordion expanded={expandedInfo} square sx={{height: "100%", bgcolor: "rgba(0,0,0,0)", backgroundImage: "none"}}>
                   <AccordionSummary
-                    sx={{borderRadius: "12px"}}
+                    sx={{borderRadius: "100px", bgcolor: "rgba(0,0,0,0)"}}
                     // expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header"
@@ -96,7 +115,7 @@ export const HomePage = () => {
                     <Typography>
                       {
                         (musicInfoToDisplay)
-                        ? JSON.stringify(musicInfoToDisplay)
+                        ? <MusicRecommendationInfo speechInfo={speechInfo} musicInfoToDisplay={musicInfoToDisplay} recommendMode={recommendMode} />
                         : ""
                       }
                     </Typography>

@@ -5,15 +5,13 @@ import { RecordButton } from '../../common/RecordButton/RecordButton'
 
 import MRApi from '../../routes/MRApi'
 
-export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay}) => {
+export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, selectedMode, setSelectedMode}) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
   const [recommendedMusic, setRecommendedMusic] = useState([]);
-  const [emotion, setEmotion] = useState("");
-  const [emotionPercentage, setEmotionPercentage] = useState(null);
   const [genre, setGenre] = useState("pop");
-  const [mode, setMode] = useState(0);
+  const [predictMode, setPredictMode] = useState('');
 
   const [dropActive, setDropActive] = useState([]);
 	const audioFileInputRef= useRef(null);
@@ -60,6 +58,7 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 
   const moreInfo = (music) => {
     setMusicInfoToDisplay(music);
+    console.log(music);
     setExpandedInfo(true);
   }
 
@@ -68,16 +67,16 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
     setIsLoading(true);
     let formData = new FormData();
     formData.append(recordedAudio['className'], recordedAudio['blob'], recordedAudio['fileName']);
+    formData.append('mode', selectedMode);
 
     const response = await MRApi.getMusicRecommendation(formData);
     console.log(response);
-    const resEmotion = response['data']['emotion'];
-    const percentage = response['data']['percentage'];
+    const speechInfo = response['data']['speech_info'];
     const songList = response['data']['song_list'];
 
+    setSpeechInfo(speechInfo);
     setRecommendedMusic(songList);
-    setEmotion(resEmotion);
-    setEmotionPercentage([percentage['Anger'],percentage['Happiness'], percentage['Neutral'], percentage['Sadness']]);
+    setPredictMode(selectedMode);
     setIsLoading(false);
   }
 
@@ -86,7 +85,8 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
   };
 
   const changeMode = (event) => {
-    setMode(event.target.value);
+    setSelectedMode(event.target.value);
+    console.log(event.target.value);
   };
 
   useEffect(() => {
@@ -142,13 +142,14 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      value={mode}
+                      value={selectedMode}
                       label="Mode"
                       onChange={changeMode}
                     >
-                      <MenuItem value={0}>Audio Only</MenuItem>
-                      <MenuItem value={1}>Audio and Text</MenuItem>
-                      <MenuItem value={2}>Audio, Text, and Context</MenuItem>
+                      <MenuItem value={'audio'}>Audio Only</MenuItem>
+                      <MenuItem value={'lyrics'}>Lyrics Only</MenuItem>
+                      <MenuItem value={'combined'}>Audio and Text</MenuItem>
+                      <MenuItem value={'all?'}>Audio, Text, and Context</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -180,54 +181,58 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
             </Paper>
           </Grid>
           <Grid item xs={3} sx={{ flexGrow: 1 }}  >
-            <Paper variant="outlined" sx={{ height: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "12px", p: 2 }}>
-              
+            <Paper variant="outlined" sx={{ height: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", p: 2 }}>
+              { (speechInfo && 'emotion' in speechInfo ) ? speechInfo['emotion'] : "" }
             </Paper>
           </Grid>
         </Grid>
       </Grid>
       <Grid item xs={12} sm={8} xl={9} sx={{ height: "100%"}} >
-        <Paper variant="outlined" sx={{ height: "100%", maxHeight: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "12px", p: 2 }}>
-          <Grid container spacing={2} sx={{ height: "100%", overflowY: "auto" }}>
+        <Paper variant="outlined" sx={{ height: "100%", maxHeight: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", px: 2, py: 1, overflowY: "auto" }}>
+          
+                  
             {
               (recommendedMusic !== [])
               ? recommendedMusic.map((music) => {
 
                 return (
-                  // <iframe title={music[0]} src={"https://open.spotify.com/embed/track/" + music[0]} width="225" height="152" frameBorder="0"></iframe>
-                  <Grid key={music[0]} item xs={12} sm={6} md={4} >
-                    <Card sx={{bgcolor: "rgb(183, 29, 30)", p: 1, borderRadius: "10px"}}>
-                      <Grid
-                        container
-                        spacing={1}
-                        direction="row"
-                        justify="flex-start"
-                        alignItems="flex-start"
-                        alignContent="stretch"
-                        
-                      >
-                        <Grid item xs={12} >
-                          <iframe title={music[0]} src={"https://open.spotify.com/embed/track/" + music[0]} width="100%" height="152" frameBorder="0"></iframe>
-                        </Grid>
-                        <Grid item xs={6} >
-                          <Typography variant="h3" align="center" pt="3px" >
-                            84%
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6} >
-                          <Button variant="contained" sx={{width: "100%"}} onClick={(e) => moreInfo(music)} >
-                            More
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </Card>
+                  <Grid
+                    container
+                    spacing={2}
+                    direction="row"
+                    justify="flex-start"
+                    alignItems="flex-start"
+                    alignContent="stretch"
+                    wrap="nowrap"
+                    sx={{height: "100px", my: 1}}
+                    key={music['spotify_id']}
+                  >
+                    <Grid item xs={10}>
+                      <iframe title={music['spotify_id']} src={"https://open.spotify.com/embed/track/" + music['spotify_id']} width="100%" height="100px" frameBorder="0"></iframe>
+                    </Grid>
+                    <Grid item xs={2}>
+                      <Typography variant="h3" align="center" pt="3px" sx={{height: "40px", mt: "3px"}}>
+                        {
+                          (predictMode === 'audio')
+                            ? music['audio']['similarity']
+                            : (predictMode === 'lyrics')
+                              ? music['lyrics']['similarity']
+                              : (predictMode === 'combined')
+                                ? music['lyrics']['similarity']
+                                : "???"
+                        }
+                      </Typography>
+                      <Button variant="contained" sx={{height: "35px", width: "100%"}} onClick={(e) => moreInfo(music)} >
+                        More
+                      </Button>
+                    </Grid>
                   </Grid>
                 )
               })
               : ""
             }
 
-          </Grid>
+          {/* </Grid> */}
         </Paper>
       </Grid>
      </Grid>

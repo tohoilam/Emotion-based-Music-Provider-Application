@@ -3,8 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
-import { createTheme, ThemeProvider, typography } from '@mui/material';
-import { green, orange } from '@mui/material/colors';
+import { createTheme, CssBaseline, ThemeProvider, typography } from '@mui/material';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -71,9 +70,7 @@ const theme = createTheme({
 
 root.render(
   <BrowserRouter>
-    <ThemeProvider theme={theme}>
-      <App />
-    </ThemeProvider>
+    <App />
   </BrowserRouter>
 );
 

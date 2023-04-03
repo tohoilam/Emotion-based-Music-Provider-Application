@@ -24,26 +24,29 @@ def too_large(e):
 @music_recommendation_blueprint.route(PATH_DIR_NAME + '/getsongs', methods=['POST'])
 @cross_origin()
 def getSongs():
+  if ('mode' not in request.form or request.form['mode'] not in ['audio', 'lyrics', 'combined']):
+    errMsg = 'Mode of recommendation is not indicated'
+    print('Failed: ' + errMsg)
+    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+  
+  mode = request.form['mode']
   result = SER_Predict_Full(request, fixed_model_choice=MODEL_CHOICE)
-  speech_emotion = result['data'][0]
-  emotion_percentages = speech_emotion['percentage']
+  speech_info = result['data'][0]
+  emotion_percentages = speech_info['percentage']
 
-  anger = emotion_percentages['Anger']
-  happiness = emotion_percentages['Happiness']
-  calmness = emotion_percentages['Calmness']
-  sadness = emotion_percentages['Sadness']
+  lyrics_weighting = 0.5
 
-  songList = getSongList(SONGS_JSON_PATH, happiness, calmness, anger, sadness, output_no=20)
+  # path to song_list
+  if (mode == 'audio'):
+    json_path = os.path.join('components', 'music_recommendation', 'songs_audio.json')
+  else:
+    json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
+
+  songList = getSongList(emotion_percentages, mode, json_path, lyrics_weighting=lyrics_weighting, output_no=20)
 
   returnData = {
-    "emotion": speech_emotion['emotion'],
-    "percentage": {
-      "Anger" : anger,
-      "Happiness": happiness,
-      "Calmness": calmness,
-      "Sadness": sadness
-    },
-    "song_list": songList
+    "speech_info": speech_info,
+    "song_list": songList,
   }
   return {'data': returnData, 'status': 'ok', 'errMsg': ''}
 
@@ -51,11 +54,37 @@ def getSongs():
 @music_recommendation_blueprint.route(PATH_DIR_NAME + '/testing')
 @cross_origin()
 def getSongsTesting():
+  speech_info = {
+    'percentage': {
+      'Anger': 0.1,
+      'Happiness': 0.1,
+      'Sadness': 0.7,
+      'Calmness': 0.1
+    },
+    'emotion': 'Sadness'
+  }
+  
+  emotion_percentages = speech_info['percentage']
 
-  songList = getSongList(SONGS_JSON_PATH, 0.1, 0.1, 0.7, 0.1, output_no=30)
+  lyrics_weighting = 0.5
+  # mode can be 'audio', 'lyrics' or 'combined'
+  mode = 'combined'
+  # # speech_prob should be [happiness, anger, sadness, calmness]
+  # speech_prob = [0.7, 0.2, 0.05, 0.05]
 
-  print(songList)
-  return songList
+  # path to song_list
+  if (mode == 'audio'):
+    json_path = os.path.join('components', 'music_recommendation', 'songs_audio.json')
+  else:
+    json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
+
+  songList = getSongList(emotion_percentages, mode, json_path, lyrics_weighting=lyrics_weighting, output_no=20)
+
+  returnData = {
+    "speech_info": speech_info,
+    "song_list": songList,
+  }
+  return {'data': returnData, 'status': 'ok', 'errMsg': ''}
 
 
 
