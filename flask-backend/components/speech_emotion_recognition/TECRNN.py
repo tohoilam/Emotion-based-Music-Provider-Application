@@ -25,12 +25,7 @@ def predict(x, model_path):
     ys_pred = model.predict(x)
     return ys_pred
 
-def audio_speech_to_text(audio_path):
-    audio = AudioSegment.from_file(audio_path)
-    if (audio.frame_rate != 16000):
-        audio = audio.set_frame_rate(16000)
-    if (audio.channels != 1):
-        audio = audio.set_channels(1)
+def audio_speech_to_text(audio):
 
     wavIO=io.BytesIO()
     audio.export(wavIO, format="wav")

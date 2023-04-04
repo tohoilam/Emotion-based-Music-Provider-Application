@@ -1,4 +1,4 @@
-import { Box, useTheme } from '@mui/material';
+import { Box, Paper, useTheme } from '@mui/material';
 import { ResponsivePie } from '@nivo/pie';
 import { tokens } from '../../theme';
 import Header from '../Header';
@@ -37,7 +37,7 @@ const mockData = [
 // no chart will be rendered.
 // website examples showcase many properties,
 // you'll often use just a few of them.
-const DonutChart = ({data, title, subtitle}) => {
+const DonutChart = ({data, height, title, subtitle}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
@@ -49,7 +49,7 @@ const DonutChart = ({data, title, subtitle}) => {
       data={data}
       colors={chartsEmotionColors}
       theme={chartsTheme}
-      margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+      margin={{ top: 20, right: 80, bottom: 60, left: 80 }}
       innerRadius={0.6}
       padAngle={1.5}
       cornerRadius={2.5}
@@ -68,12 +68,15 @@ const DonutChart = ({data, title, subtitle}) => {
       arcLinkLabelsTextColor={colors.grey[100]}
       arcLinkLabelsThickness={1}
       arcLinkLabelsColor={{ from: 'color' }}
-      arcLabelsSkipAngle={10}
+      arcLabelsSkipAngle={20}
+      arcLinkLabelsDiagonalLength={6}
+      arcLinkLabelsStraightLength={6}
+      enableArcLinkLabels={false}
       arcLabelsTextColor={{
         from: 'color',
         modifiers: [
           [
-            'darker',
+            'brighter',
             3
           ]
         ]
@@ -154,14 +157,14 @@ const DonutChart = ({data, title, subtitle}) => {
           direction: 'row',
           justify: false,
           translateX: 0,
-          translateY: 56,
+          translateY: 30,
           itemsSpacing: 0,
-          itemWidth: 100,
+          itemWidth: 68,
           itemHeight: 18,
           itemTextColor: colors.grey[100],
-          itemDirection: 'left-to-right',
+          itemDirection: 'top-to-bottom',
           itemOpacity: 1,
-          symbolSize: 20,
+          symbolSize: 17,
           symbolShape: 'circle',
           effects: [
             {
@@ -180,12 +183,12 @@ const DonutChart = ({data, title, subtitle}) => {
     
     
   return (
-    <Box m="20px">
+    <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px"}} m="20px">
       <Header title={title} subtitle={subtitle}></Header>
-      <Box height="300px">
+      <Box height={height}>
         <Donut />
       </Box>
-    </Box>
+    </Paper>
   )
 }
     

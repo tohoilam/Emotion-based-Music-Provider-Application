@@ -176,7 +176,7 @@ export const SpeechEmotionRecognition = () => {
 														let frustration_percentage = percentage.Frustration ? parseFloat(percentage.Frustration) * 100 : 0.0;
 														let happiness_percentage = percentage.Happiness ? parseFloat(percentage.Happiness) * 100 : 0.0;
 														let sadness_percentage = percentage.Sadness ? parseFloat(percentage.Sadness) * 100 : 0.0;
-														let neutral_percentage = percentage.Neutral ? parseFloat(percentage.Neutral) * 100 : 0.0;
+														let calmness_percentage = percentage.Calmness ? parseFloat(percentage.Calmness) * 100 : 0.0;
 
 														let colorA = '#8B8484'; // Darker
 														let colorB = '#B8B8B8'; // Lighter
@@ -201,7 +201,7 @@ export const SpeechEmotionRecognition = () => {
 															colorA = '#00EB46';
 															colorB = '#76D0A2';
 														}
-														else if (emotion === 'Neutral') {
+														else if (emotion === 'Calmness') {
 															// Grey
 															colorA = '#AFBBB5';
 															colorB = '#DAE1DE';
@@ -224,7 +224,7 @@ export const SpeechEmotionRecognition = () => {
 																	<div className="specific-emotion-percentage frustration-emotion" style={{width: `${frustration_percentage}%`}}>{frustration_percentage >= 10 ? frustration_percentage.toFixed(1).toString() + "%" : ""}</div>
 																	<div className="specific-emotion-percentage happiness-emotion" style={{width: `${happiness_percentage}%`}}>{happiness_percentage >= 10 ? happiness_percentage.toFixed(1).toString() + "%" : ""}</div>
 																	<div className="specific-emotion-percentage sadness-emotion" style={{width: `${sadness_percentage}%`}}>{sadness_percentage >= 10 ? sadness_percentage.toFixed(1).toString() + "%" : ""}</div>											
-																	<div className="specific-emotion-percentage neutral-emotion" style={{width: `${neutral_percentage}%`}}>{neutral_percentage >= 10 ? neutral_percentage.toFixed(1).toString() + "%" : ""}</div>
+																	<div className="specific-emotion-percentage calmness-emotion" style={{width: `${calmness_percentage}%`}}>{calmness_percentage >= 10 ? calmness_percentage.toFixed(1).toString() + "%" : ""}</div>
 																</div>
 															</li>
 														)

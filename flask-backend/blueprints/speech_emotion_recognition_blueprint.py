@@ -1,10 +1,13 @@
 import os
+import copy
 import json
 import numpy as np
 import tensorflow as tf
 from flask import Flask, request
 from flask import Blueprint
 from flask_cors import cross_origin
+from pydub import AudioSegment, effects
+
 
 from components.speech_emotion_recognition.SERDataProcessing import SERDataProcessing
 from components.speech_emotion_recognition.TECRNN import evaluateTextInSpeech
@@ -45,17 +48,115 @@ def models():
 @speech_emotion_recognition_blueprint.route(PATH_DIR_NAME + '/predict', methods=['POST'])
 @cross_origin()
 def predict():
-  return SER_Predict(request)
+  # 1). Pack audio files
+  fileList = []
+  filenameList = []
+
+  if (len(request.files) != 0):
+    for filename in request.files:
+      file = request.files[filename]
+
+      audio = AudioSegment.from_file(file)
+        
+      if (audio.frame_rate != 16000):
+        audio = audio.set_frame_rate(16000)
+      if (audio.channels != 1):
+        audio = audio.set_channels(1)
+
+      fileList.append(audio)
+      filenameList.append(filename)
+  else:
+    warnMsg = 'No audio data to predict.'
+    print('Warning: ' + warnMsg)
+    return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+
+    # 3). Get audio files and save in backend
+  # UPLOAD_DIR = os.path.join(os.getcwd(), MODEL_PATH, 'audio_data')
+  # fileList = []
+  # filenameList = []
+
+  # if (len(request.files) != 0):
+  #   for filename in request.files:
+  #     try:
+  #       file = request.files[filename]
+  #       file.save(os.path.join(UPLOAD_DIR, file.filename))
+  #     except Exception as e:
+  #       errMsg = 'Save audio file in backend failed! ' + e
+  #       print('Failed: ' + errMsg)
+  #       return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+  # else:
+  #   warnMsg = 'No audio data to predict.'
+  #   print('Warning: ' + warnMsg)
+  #   return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+  
+  #   # Load and extract audio
+  # for dirname, _, filenames in os.walk(UPLOAD_DIR):
+  #   for filename in filenames:
+      
+  #     if (filename == 'desktop.ini' or filename == 'desktop.in.txt' or filename == '.DS_Store' or filename == '.DS'):
+  #       continue
+      
+  #     # Load Audio and x
+  #     wav_path = os.path.join(dirname, filename)
+  #     audio = AudioSegment.from_file(wav_path)
+  #     # info = mediainfo(wav_path)
+      
+  #     if (audio.frame_rate != 16000):
+  #       audio = audio.set_frame_rate(16000)
+  #     if (audio.channels != 1):
+  #       audio = audio.set_channels(1)
+        
+  #     sr = audio.frame_rate
+      
+  #     audio = effects.normalize(audio, headroom = 5.0) # TODO: Try other head room
+      
+  #     # x = librosa.resample(x, orig_sr=audio.frame_rate, target_sr=16000)
+      
+  #     # x_list.append(x)
+  #     # sr_list.append(sr)
+  #     # recording_names.append(filename)
+
+
+  #     # Load Audio and x
+  #     wav_path = os.path.join(dirname, filename)
+      
+  #     fileList.append(audio)
+  #     filenameList.append(filename)
+
+  
+  return SER_Predict(request, fileList, filenameList)
 
 
 @speech_emotion_recognition_blueprint.route(PATH_DIR_NAME + '/predict-by-text', methods=['POST'])
 @cross_origin()
 def predictByText():
-  return Text_Predict(request)
+  # 1). Pack audio files
+  fileList = []
+  filenameList = []
+
+  if (len(request.files) != 0):
+    for filename in request.files:
+      file = request.files[filename]
+
+      audio = AudioSegment.from_file(file)
+        
+      if (audio.frame_rate != 16000):
+        audio = audio.set_frame_rate(16000)
+      if (audio.channels != 1):
+        audio = audio.set_channels(1)
+
+      fileList.append(audio)
+      filenameList.append(filename)
+  else:
+    warnMsg = 'No audio data to predict.'
+    print('Warning: ' + warnMsg)
+    return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+
+  return Text_Predict(request, fileList, filenameList)
 
 
-def SER_Predict_Full(api_request, fixed_model_choice=None):
-  result = SER_Predict(api_request, fixed_model_choice=fixed_model_choice)
+def SER_Predict_Full(api_request, fileList, filenameList, fixed_model_choice=None):
+  result = SER_Predict(api_request, fileList, filenameList, fixed_model_choice=fixed_model_choice)
   separated_predicted_list = result['data']
   packed_predicted_list = []
 
@@ -103,9 +204,32 @@ def SER_Predict_Full(api_request, fixed_model_choice=None):
   
   return {'data': packed_predicted_list, 'status': 'ok', 'errMsg': ''}
 
-def SER_Predict(api_request, fixed_model_choice=None):
+def SER_Predict(api_request, fileList, filenameList, fixed_model_choice=None):
   print('Speech Emotion Recognition Predict')
-  # 1). Get model config
+  # # 1). Pack audio files
+  # fileList = []
+  # filenameList = []
+
+  # if (len(api_request.files) != 0):
+  #   for filename in api_request.files:
+  #     file = api_request.files[filename]
+
+  #     audio = AudioSegment.from_file(file)
+        
+  #     if (audio.frame_rate != 16000):
+  #       audio = audio.set_frame_rate(16000)
+  #     if (audio.channels != 1):
+  #       audio = audio.set_channels(1)
+
+  #     fileList.append(audio)
+  #     filenameList.append(filename)
+  # else:
+  #   warnMsg = 'No audio data to predict.'
+  #   print('Warning: ' + warnMsg)
+  #   return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+
+
+  # 2). Get model config
   modelListConfig = getModelConfig()
   if (not modelListConfig):
     errMsg = 'Fail to access model config file'
@@ -113,7 +237,7 @@ def SER_Predict(api_request, fixed_model_choice=None):
     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
 
     
-  # 2). Check if model choice parameter is passed correctly
+  # 3). Check if model choice parameter is passed correctly
   if (fixed_model_choice == None):
     if ('modelChoice' not in api_request.form or api_request.form['modelChoice'] == 'null'):
       errMsg = 'Model is not selected! Please select a model from dropdown!'
@@ -123,20 +247,6 @@ def SER_Predict(api_request, fixed_model_choice=None):
     modelChoice = int(api_request.form['modelChoice'])
   else:
     modelChoice = fixed_model_choice
-  
-  # 3). Pack audio files
-  fileList = []
-  filenameList = []
-
-  if (len(api_request.files) != 0):
-    for filename in api_request.files:
-      file = api_request.files[filename]
-      fileList.append(file)
-      filenameList.append(filename)
-  else:
-    warnMsg = 'No audio data to predict.'
-    print('Warning: ' + warnMsg)
-    return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
 
   # 4). A: Get Model Choice and Configure Model; B: Load and Process data
   if (modelListConfig != None):
@@ -177,24 +287,10 @@ def SER_Predict(api_request, fixed_model_choice=None):
   
   return {'data': predicted_data_list, 'status': 'ok', 'errMsg': ''}
 
-def Text_Predict(api_request):
+def Text_Predict(api_request, fileList, filenameList):
   print('Text Emotion Recognition Predict')
 
   modelDir = os.path.join(os.getcwd(), MODEL_PATH, 'TECRNN')
-
-  # 1). Pack audio files
-  fileList = []
-  filenameList = []
-
-  if (len(api_request.files) != 0):
-    for filename in api_request.files:
-      file = api_request.files[filename]
-      fileList.append(file)
-      filenameList.append(filename)
-  else:
-    warnMsg = 'No audio data to predict.'
-    print('Warning: ' + warnMsg)
-    return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
   
   textEmotionList = []
   for pos, audio_file in enumerate(fileList):

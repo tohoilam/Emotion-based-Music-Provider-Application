@@ -5,7 +5,7 @@ import { RecordButton } from '../../common/RecordButton/RecordButton'
 
 import MRApi from '../../routes/MRApi'
 
-export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, selectedMode, setSelectedMode}) => {
+export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, selectedMode, setSelectedMode, setAudioScatterData}) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
@@ -56,12 +56,63 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 
 	}
 
-  const moreInfo = (music) => {
-    setMusicInfoToDisplay(music);
-    console.log(music);
+  const moreInfo = (selectedMusic) => {
+    setMusicInfoToDisplay(selectedMusic);
+    
+    const selectedMusicPoints = [{
+      "x": selectedMusic["audio"]["valence"],
+      "y": selectedMusic["audio"]["arousal"]
+    }]
+
+    const nonSelectedMusicPoints = recommendedMusic
+                                    .filter(music => music['spotify_id'] !== selectedMusic['spotify_id'] )
+                                    .map(music => {
+                                      return ({
+                                        "x": music["audio"]["valence"],
+                                        "y": music["audio"]["arousal"]
+                                      })
+                                    })
+
+    const va = emotionPercentagesToVA(speechInfo["audio"]["percentage"]);
+
+    const speechPoints = [{
+      "x": va["valence"],
+      "y": va["arousal"]
+    }];
+
+    setAudioScatterData([
+      {
+        "id": "Other Songs",
+        "data": nonSelectedMusicPoints
+      },
+      {
+        "id": "Speech",
+        "data": speechPoints
+      },
+      {
+        "id": "Selected Song",
+        "data": selectedMusicPoints
+      }
+    ]);
+
+
     setExpandedInfo(true);
   }
 
+  const emotionPercentagesToVA = (percentage) => {
+    const valence = (percentage['Happiness'] + percentage['Calmness'])*2 - 1
+    const arousal = (percentage['Happiness'] + percentage['Anger'])*2 - 1;
+    console.log(percentage);
+    console.log(arousal);
+    return {
+      "valence": valence,
+      "arousal": arousal
+    }
+  }
+
+  const toPercentageFormat = (decimal) => {
+    return (decimal * 100).toFixed(2);
+  }
 
   const recommendMusic = async () => {
     setIsLoading(true);
@@ -147,9 +198,8 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
                       onChange={changeMode}
                     >
                       <MenuItem value={'audio'}>Audio Only</MenuItem>
-                      <MenuItem value={'lyrics'}>Lyrics Only</MenuItem>
                       <MenuItem value={'combined'}>Audio and Text</MenuItem>
-                      <MenuItem value={'all?'}>Audio, Text, and Context</MenuItem>
+                      <MenuItem value={'all'}>Audio, Text, and Context</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -214,12 +264,10 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
                       <Typography variant="h3" align="center" pt="3px" sx={{height: "40px", mt: "3px"}}>
                         {
                           (predictMode === 'audio')
-                            ? music['audio']['similarity']
-                            : (predictMode === 'lyrics')
-                              ? music['lyrics']['similarity']
-                              : (predictMode === 'combined')
-                                ? music['lyrics']['similarity']
-                                : "???"
+                            ? toPercentageFormat(music['audio']['similarity']).toString() + "%"
+                            : (predictMode === 'combined')
+                              ? toPercentageFormat(music['combined']['similarity']).toString() + "%"
+                              : "???"
                         }
                       </Typography>
                       <Button variant="contained" sx={{height: "35px", width: "100%"}} onClick={(e) => moreInfo(music)} >

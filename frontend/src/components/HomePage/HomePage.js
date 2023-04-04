@@ -22,6 +22,7 @@ export const HomePage = () => {
   const [expandedInfo, setExpandedInfo] = useState(true);
   const [musicInfoToDisplay, setMusicInfoToDisplay] = useState(null);
   const [speechInfo, setSpeechInfo] = useState(null);
+  const [audioScatterData, setAudioScatterData] = useState([]);
   const [recommendMode, setRecommendMode] = useState('audio');
   const [tab, setTab] = React.useState('1');
 
@@ -97,6 +98,7 @@ export const HomePage = () => {
                   speechInfo={speechInfo}
                   selectedMode={recommendMode}
                   setSelectedMode={setRecommendMode}
+                  setAudioScatterData={setAudioScatterData}
               ></HomeMusicRecommendation>
               {/* <Box ref={infoRef} sx={{height: (expandedInfo) ? "100%" : "5%"}}>
                 <Paper sx={{height: "100%", mt: 3, bgcolor: theme.palette.secondary.main, borderRadius: "12px" }}></Paper>
@@ -115,7 +117,12 @@ export const HomePage = () => {
                     <Typography>
                       {
                         (musicInfoToDisplay)
-                        ? <MusicRecommendationInfo speechInfo={speechInfo} musicInfoToDisplay={musicInfoToDisplay} recommendMode={recommendMode} />
+                        ? <MusicRecommendationInfo
+                              speechInfo={speechInfo}
+                              musicInfoToDisplay={musicInfoToDisplay}
+                              recommendMode={recommendMode}
+                              audioScatterData={audioScatterData}
+                          />
                         : ""
                       }
                     </Typography>

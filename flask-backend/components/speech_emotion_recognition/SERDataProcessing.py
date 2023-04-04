@@ -38,13 +38,13 @@ class SERDataProcessing:
     recording_names = []
     
     # Convert audio file to wav format
-    for i, audioBytes in enumerate(audioBytesList):
-      audio = AudioSegment.from_file(audioBytes)
+    for i, audio in enumerate(audioBytesList):
+      # audio = AudioSegment.from_file(audioBytes)
         
-      if (audio.frame_rate != 16000):
-        audio = audio.set_frame_rate(16000)
-      if (audio.channels != 1):
-        audio = audio.set_channels(1)
+      # if (audio.frame_rate != 16000):
+      #   audio = audio.set_frame_rate(16000)
+      # if (audio.channels != 1):
+      #   audio = audio.set_channels(1)
         
       sr = audio.frame_rate
       

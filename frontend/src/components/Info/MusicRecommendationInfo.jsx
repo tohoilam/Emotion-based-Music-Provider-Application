@@ -1,17 +1,22 @@
-import { Grid } from '@mui/material'
+import { Grid, Box, Typography, Paper, useTheme } from '@mui/material'
+import { tokens } from '../../theme';
 import React from 'react'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import DonutChart from '../../common/Charts/DonutChart'
 import LineChart from '../../common/Charts/LineChart'
 import RadarChart from '../../common/Charts/RadarChart'
+import ScatterChart from '../../common/Charts/ScatterChart'
+import Header from '../../common/Header';
 
-export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recommendMode}) => {
+export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recommendMode, audioScatterData}) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   const [speechEmotionDonutData, setSpeechEmotionDonutData] = useState(null);
-  const [acousticEmotionDonutData, setAcousticEmotionDonutData] = useState(null);
+  const [speechTextEmotionDonutData, setSpeechTextEmotionDonutData] = useState(null);
+  const [speechText, setSpeechText] = useState("");
 
-  const [textEmotionDonutData, setTextEmotionDonutData] = useState(null);
   const [lyricsEmotionDonutData, setLyricsEmotionDonutData] = useState(null);
 
   const packEmotionDonutData = (anger, calmness, happiness, sadness) => {
@@ -41,35 +46,51 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
 
   const updateSpeechEmotionDonutData = () => {
     if (speechInfo){
-      const percentage = speechInfo['percentage'];
-      const donutData = packEmotionDonutData(percentage['Anger'], percentage['Calmness'], percentage['Happiness'], percentage['Sadness']);
+      const percentage = speechInfo['audio']['percentage'];
+      const donutData = packEmotionDonutData(
+                            toPercentageFormat(percentage['Anger']),
+                            toPercentageFormat(percentage['Calmness']),
+                            toPercentageFormat(percentage['Happiness']),
+                            toPercentageFormat(percentage['Sadness'])
+                        );
+      setSpeechTextEmotionDonutData(donutData);
+    }
+  }
+
+  const updateSpeechTextEmotionDonutData = () => {
+    if (speechInfo && 'text' in speechInfo && 'percentage' in speechInfo['text']) {
+      const percentage = speechInfo['text']['percentage'];
+      const donutData = packEmotionDonutData(
+                            toPercentageFormat(percentage['Anger']),
+                            toPercentageFormat(percentage['Calmness']),
+                            toPercentageFormat(percentage['Happiness']),
+                            toPercentageFormat(percentage['Sadness'])
+                        );
       setSpeechEmotionDonutData(donutData);
     }
   }
 
-  const updateAcousticEmotionDonutData = () => {
-    if (musicInfoToDisplay && 'audio' in musicInfoToDisplay) {
-      const arousal = musicInfoToDisplay['audio']['arousal'];
-      const valence = musicInfoToDisplay['audio']['valence'];
-      const percentage = vaToEmotion(valence, arousal);
-      console.log(percentage);
-      const donutData = packEmotionDonutData(percentage['Anger'], percentage['Calmness'], percentage['Happiness'], percentage['Sadness']);
-      setAcousticEmotionDonutData(donutData);
+  const updateSpeechText = () => {
+    if (speechInfo && 'text' in speechInfo && 'text' in speechInfo['text']) {
+      const text = speechInfo['text']['text'];
+      setSpeechText(text);
     }
   }
 
-  // const updateTextEmotionDonutData = () => {
-  //   if (speechInfo){
-  //     const percentage = musicInfoToDisplay['???']['percentage'];
-  //     const donutData = packEmotionDonutData(percentage['Anger'], percentage['Calmness'], percentage['Happiness'], percentage['Sadness']);
-  //     setTextEmotionDonutData(donutData);
-  //   }
-  // }
+
+
 
   const updateLyricsEmotionDonutData = () => {
     if (musicInfoToDisplay && 'lyrics' in musicInfoToDisplay && 'percentage' in musicInfoToDisplay['lyrics']) {
+
       const percentage = musicInfoToDisplay['lyrics']['percentage'];
-      const donutData = packEmotionDonutData(percentage['Anger'], percentage['Calmness'], percentage['Happiness'], percentage['Sadness']);
+      const donutData = packEmotionDonutData(
+          toPercentageFormat(percentage['Anger']),
+          toPercentageFormat(percentage['Calmness']),
+          toPercentageFormat(percentage['Happiness']),
+          toPercentageFormat(percentage['Sadness'])
+      );
+
       setLyricsEmotionDonutData(donutData);
     }
   }
@@ -99,57 +120,109 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
     }
   }
 
+  const toPercentageFormat = (decimal) => {
+    return (decimal * 100).toFixed(2);
+  }
+
   useEffect(() => {
-    console.log(speechInfo);
     updateSpeechEmotionDonutData();
+
+    if (recommendMode !== 'audio') {
+      updateSpeechTextEmotionDonutData();
+      updateSpeechText();
+    }
   }, [speechInfo]);
 
   useEffect(() => {
-    console.log(musicInfoToDisplay);
-    updateAcousticEmotionDonutData();
-
     if (recommendMode !== 'audio') {
       updateLyricsEmotionDonutData();
     }
     
   }, [musicInfoToDisplay]);
 
+  
+
   return (
     <Grid
       container
-      spacing={1}
+      spacing={3}
       direction="row"
       justify="flex-start"
       alignItems="flex-start"
       alignContent="stretch"
-      wrap="nowrap"
       
     >
+      <Grid item xs={12} >
+        <Typography variant="h1">
+          Audio & Acoustics Analysis
+        </Typography>
+      </Grid>
       {
         (speechEmotionDonutData)
           ? <Grid item xs={4}>
-              <DonutChart data={speechEmotionDonutData} title="Speech Emotion" subtitle="Idk" />
+              <DonutChart data={speechEmotionDonutData} height="250px" title="Speech Emotion" subtitle="Speech audio emotion percentages" />
+              <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px", mt: 3, height: "226px"}} m="20px">
+
+              </Paper>
             </Grid>
           : ""
       }
-      {/* <Grid item xs={4}>
-        <LineChart />
-      </Grid> */}
-      {/* {
-        (acousticEmotionDonutData)
-          ?<Grid item xs={4}>
-            <DonutChart data={acousticEmotionDonutData} title="Acoustic Emotion" subtitle="Idk" />
-          </Grid>
+      {
+        (audioScatterData)
+          ? <Grid item xs={8}>
+              <ScatterChart data={audioScatterData} height="500px" title="Audio Valence-Arousal (VA) Space" subtitle="Coordinates of speech audio and suggested songs on a Valence-Arousal plane" />
+            </Grid>
           : ""
-      } */}
+      }
+
+
 
       {
-        (recommendMode != "audio" && lyricsEmotionDonutData)
-          ? <Grid item xs={4}>
-              <DonutChart data={lyricsEmotionDonutData} title="Lyrics Emotion" subtitle="Idk" />
+        (recommendMode !== 'audio')
+          ? <Grid item xs={12} mt={5} >
+              <Typography variant="h1">
+                Text & Lyrics Analysis
+              </Typography>
             </Grid>
           : ""
       }
+      {
+        (recommendMode != "audio" && speechTextEmotionDonutData)
+          ? <Grid item xs={6}>
+              <DonutChart data={speechTextEmotionDonutData} height="250px" title="Text Emotion" subtitle="Speech text emotion percentages" />
+            </Grid>
+          : ""
+      }
+      {
+        (recommendMode != "audio" && lyricsEmotionDonutData)
+          ? <Grid item xs={6}>
+              <DonutChart data={lyricsEmotionDonutData} height="250px" title="Lyrics Emotion" subtitle="Lyrics emotion percentages of the selected song" />
+            </Grid>
+          : ""
+      }
+      {
+        (recommendMode != "audio" && speechText)
+          ? <Grid item xs={6}>
+              <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px", height: "250px"}} m="20px">
+                <Header title="Speech Transcript" subtitle=""></Header>
+                <Paper variant="outlined" sx={{backgroundColor: colors.blueAccent[900], p: 2, borderRadius: "6px", height: "160px", mt: "20px", overflow: "auto"}} mt="10px" >
+                  <Typography variant="h5">{speechText}</Typography>
+                </Paper>
+                
+              </Paper>
+            </Grid>
+          : ""
+      }
+      {
+        (recommendMode != "audio")
+          ? <Grid item xs={6}>
+              <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px", height: "250px"}} >
+
+              </Paper>
+            </Grid>
+          : ""
+      }
+      
       
       <Grid item xs={4}>
         <RadarChart />
