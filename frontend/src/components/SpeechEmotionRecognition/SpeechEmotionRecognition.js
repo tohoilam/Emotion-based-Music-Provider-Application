@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 
+import { RecordButton } from '../../common/RecordButton/RecordButton'
 import SERApi from '../../routes/SERApi'
+
 import './SpeechEmotionRecognition.css'
-import { useReactMediaRecorder } from 'react-media-recorder'
 
 export const SpeechEmotionRecognition = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -10,12 +11,11 @@ export const SpeechEmotionRecognition = () => {
 	const [audioList, setAudioList] = useState([]);
 	const [dropActive, setDropActive] = useState([]);
 	const [emotionResponseList, setEmotionResponseList] = useState([]);
+	const [recordedAudio, setRecordedAudio] = useState(null);
 	const audioFileInputRef= useRef(null);
 	const modelChoiceRef = useRef(null);
 
   // const sampleRate = 16000;
-
-	const { status, startRecording, stopRecording, mediaBlobUrl } = useReactMediaRecorder({ video: false });
 
 	const dropFiles = (e) => {
 		e.preventDefault();
@@ -26,6 +26,8 @@ export const SpeechEmotionRecognition = () => {
 	}
 
 	const storeFiles = (files) => {
+		const NUM_OF_STORED_FILES = audioList.length;
+
 		for (let i = 0; i < files.length; i++) {
 			const file = files[i];
 			// if (file.type != 'audio/wav' || file.type != 'audio/x-m4a' || file.type != 'audio/mpeg'  || file.type != 'audio/ogg')
@@ -38,17 +40,14 @@ export const SpeechEmotionRecognition = () => {
 				break;
 			}
 			else {
-				var blobUrl = (window.URL || window.webkitURL).createObjectURL(file);
-
-				let className = file.name.replaceAll(' ', '-');
-				console.log(className);
-				className = className.substring(0, className.indexOf('.'));
+				let blobUrl = (window.URL || window.webkitURL).createObjectURL(file);
+				let className = NUM_OF_STORED_FILES + i;
 
 				const audioObject = {
 					blob: file,
 					blobUrl: blobUrl,
 					fileName: file.name,
-					className: className
+					className: className.toString(),
 				}
 	
 				setAudioList(audioList => [...audioList, audioObject]);
@@ -67,17 +66,15 @@ export const SpeechEmotionRecognition = () => {
 		for (let i = 0; i < audioList.length; i++) {
 			const blob = audioList[i]['blob'];
 			const filename = audioList[i]['fileName'];
-			const filenameNoExtension = audioList[i]['className'];
+			const className = audioList[i]['className'];
 
 
-			formData.append(filenameNoExtension, blob, filename);
+			formData.append(className, blob, filename);
 		}
-		console.log(formData);
 
 		const response = await SERApi.getEmotionPrediction(formData);
 		if (response && response.data) {
 			setEmotionResponseList(response.data);
-			console.log(response.data);
 		}
 
 		setIsLoading(false);
@@ -97,38 +94,11 @@ export const SpeechEmotionRecognition = () => {
     fetchSERModels();
   }, [])
 
-	useEffect(() => {
-		const prepareRecording = async () => {
-			if (status === 'stopped') {
-
-				const fileName = new Date().toLocaleString('en-US', {
-																timeZone: 'Hongkong'
-															})
-															.replaceAll(',', '')
-															.replaceAll('/', '-')
-															.replace(':', 'h')
-															.replace(':', 'm');
-
-				const className = fileName.replaceAll(' ', '-');
-
-				const blob = await fetch(mediaBlobUrl).then(r => r.blob());
-				blob.name = fileName + ".wav";
-
-
-				const audioObject = {
-					blob: blob,
-					blobUrl: mediaBlobUrl,
-					fileName: fileName + ".wav",
-					className: className
-				}
-
-				setAudioList(audioList => [...audioList, audioObject]);
-
-			}
-		}
-
-		prepareRecording();
-	}, [mediaBlobUrl, status])
+  useEffect(() => {
+    if (recordedAudio) {
+			setAudioList(audioList => [...audioList, recordedAudio]);
+    }
+  }, [recordedAudio]);
 
   return (
     (isLoading)
@@ -164,9 +134,10 @@ export const SpeechEmotionRecognition = () => {
         <section id="recording-section">
           <h1 className="recording-header">Record</h1>
           <div id="recording-control">
-            <div data-role="controls">
+            {/* <div data-role="controls">
 							<button data-recording={status} onClick={(status === "recording") ? stopRecording : startRecording}>Record</button>
-            </div>
+            </div> */}
+						<RecordButton audioList={audioList} setRecordedAudio={setRecordedAudio}></RecordButton>
           </div>
         </section>
         <section id="predict-button-section">
@@ -193,7 +164,7 @@ export const SpeechEmotionRecognition = () => {
 											{
 												(emotionResponseList)
 												? emotionResponseList.filter(emotionResponse => 
-														emotionResponse.name.substring(0, emotionResponse.name.indexOf('.')) === audio['fileName'].substring(0, audio['fileName'].indexOf('.'))
+														emotionResponse.name === audio['className']
 													).map((data) => {
 														let emotion = data.emotion;
 														// let name = data.name.replaceAll('.wav', '').replaceAll(' ', '-');
@@ -205,7 +176,7 @@ export const SpeechEmotionRecognition = () => {
 														let frustration_percentage = percentage.Frustration ? parseFloat(percentage.Frustration) * 100 : 0.0;
 														let happiness_percentage = percentage.Happiness ? parseFloat(percentage.Happiness) * 100 : 0.0;
 														let sadness_percentage = percentage.Sadness ? parseFloat(percentage.Sadness) * 100 : 0.0;
-														let neutral_percentage = percentage.Neutral ? parseFloat(percentage.Neutral) * 100 : 0.0;
+														let calmness_percentage = percentage.Calmness ? parseFloat(percentage.Calmness) * 100 : 0.0;
 
 														let colorA = '#8B8484'; // Darker
 														let colorB = '#B8B8B8'; // Lighter
@@ -230,7 +201,7 @@ export const SpeechEmotionRecognition = () => {
 															colorA = '#00EB46';
 															colorB = '#76D0A2';
 														}
-														else if (emotion === 'Neutral') {
+														else if (emotion === 'Calmness') {
 															// Grey
 															colorA = '#AFBBB5';
 															colorB = '#DAE1DE';
@@ -253,7 +224,7 @@ export const SpeechEmotionRecognition = () => {
 																	<div className="specific-emotion-percentage frustration-emotion" style={{width: `${frustration_percentage}%`}}>{frustration_percentage >= 10 ? frustration_percentage.toFixed(1).toString() + "%" : ""}</div>
 																	<div className="specific-emotion-percentage happiness-emotion" style={{width: `${happiness_percentage}%`}}>{happiness_percentage >= 10 ? happiness_percentage.toFixed(1).toString() + "%" : ""}</div>
 																	<div className="specific-emotion-percentage sadness-emotion" style={{width: `${sadness_percentage}%`}}>{sadness_percentage >= 10 ? sadness_percentage.toFixed(1).toString() + "%" : ""}</div>											
-																	<div className="specific-emotion-percentage neutral-emotion" style={{width: `${neutral_percentage}%`}}>{neutral_percentage >= 10 ? neutral_percentage.toFixed(1).toString() + "%" : ""}</div>
+																	<div className="specific-emotion-percentage calmness-emotion" style={{width: `${calmness_percentage}%`}}>{calmness_percentage >= 10 ? calmness_percentage.toFixed(1).toString() + "%" : ""}</div>
 																</div>
 															</li>
 														)

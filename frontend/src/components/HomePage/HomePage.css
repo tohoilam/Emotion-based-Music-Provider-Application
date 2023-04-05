@@ -1,0 +1,328 @@
+
+#home-page {
+  position: relative;
+  display: grid;
+  width: 100%;
+  height: 100vh;
+  grid-template-columns: 100%;
+  grid-template-rows: 12% 88%;
+}
+
+#home-page header {
+  grid-row: 1 / span 1;
+}
+
+#home-page #EBMP-main {
+  height: 100%;
+  grid-row: 2 / span 1;
+  display: grid;
+  grid-template-rows: 50% 50%;
+}
+
+#home-page #EBMP-main > #tabsMenu {
+  grid-row: 1 / span 2;
+}
+
+#home-page #EBMP-main > #tabs {
+  grid-row: 2 / span 2;
+}
+
+
+
+
+/* **************************************************************************** */
+/* **************************************************************************** */
+/* *********************************** TABS *********************************** */
+/* **************************************************************************** */
+/* **************************************************************************** */
+
+
+.home-page-tab {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 25% 75%;
+}
+
+.home-page-tab #contols-section {
+  grid-column: 1 / span 1;
+}
+
+.home-page-tab #music-provider-section {
+  grid-column: 2 / span 1;
+}
+
+
+
+
+/* **************************************************************************** */
+/* **************************************************************************** */
+/* ***************************** C). Main Section ***************************** */
+/* **************************************************************************** */
+/* **************************************************************************** */
+
+.home-page-tab {
+  margin: 0px 30px;
+  background-color: rgb(58, 90, 78);
+  border-radius: 30px;
+}
+
+
+
+/* ******************************************************************************** */
+/* ******************************************************************************** */
+/* ***************************** C1). Control Section ***************************** */
+/* ******************************************************************************** */
+/* ******************************************************************************** */
+
+.home-page-tab #record-button-container {
+  width: 160px;
+  margin: auto;
+  margin-top: 50px;
+}
+
+.home-page-tab #genre-selection {
+  box-sizing: border-box;
+  margin: 20px 10px 20px 10px;
+  width: calc(100% - 20px);
+}
+
+.home-page-tab .switch-box {
+  display: flex;
+  justify-content: space-around;
+  align-content: center;
+}
+
+.home-page-tab #predict-box {
+  display: flex;
+
+}
+
+.home-page-tab #predict-box > button {
+  background-color: #3c85b6;
+  width: 250px;
+  height: 60px;
+  border-radius: 20px;
+  border: 1px solid #04273e;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #04273e;
+  cursor: pointer;
+}
+
+.home-page-tab #predict-box > button:hover {
+  background-color: #4d97c7;
+}
+
+.home-page-tab #predict-box > button:active {
+  background-color: #91cdf6;
+}
+
+.home-page-tab #predicted-emotion {
+  background-color: #3c85b6;
+  width: 250px;
+  height: 60px;
+  border-radius: 20px;
+  border: 1px solid #04273e;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #04273e;
+  cursor: pointer;
+}
+
+
+
+/* ************************************************************************************ */
+/* ************************************************************************************ */
+/* ***************************** C1). Music Board Section ***************************** */
+/* ************************************************************************************ */
+/* ************************************************************************************ */
+.home-page-tab #music-provider-section {
+  height: 100%;
+  background-color: rgb(31, 54, 49);
+  border-radius: 30px;
+  overflow-y: auto;
+}
+
+.home-page-tab #music-board {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-around;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#loading {
+  position: fixed;
+  height: 100vh;
+  width: 100vw;
+  z-index: 10000;
+  background-color: rgba(0, 0, 0, 0.571);
+}
+
+#loader {
+  border: 5px solid #f3f3f3; /* Light grey */
+  border-top: 5px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  margin: auto;
+  margin-top: 45vh;
+  animation: spin 0.7s linear infinite;
+}
+
+.not-loading {
+  left: -100%;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ***************************************************************************** */
+/* ***************************************************************************** */
+/* ************************** B). File Upload Section ************************** */
+/* ***************************************************************************** */
+/* ***************************************************************************** */
+#file-upload {
+  width: 100%;
+  padding: 5px;
+  /* background: #6fe1f5; */
+  border-radius: 5px;
+}
+
+#file-upload #upload-form {
+  height: 50px;
+  display: flex;
+  margin: 20px 0px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 5px;
+  border: 2px dashed #3c85b6;
+}
+
+#file-upload #upload-form i {
+  font-size: 50px;
+  color: #3c85b6;
+}
+
+#file-upload #upload-form p {
+  font-size: 16px;
+  margin-top: 15px;
+  color: #3c85b6;
+}
+
+#file-upload #upload-form[drop-active=true] {
+  border: 2px dashed #8bcbf6;
+}
+
+#file-upload #upload-form[drop-active=true] i {
+  color: #8bcbf6;
+}
+
+#file-upload #upload-form[drop-active=true] p {
+  color: #8bcbf6;
+}
+
+#file-input {
+  position: absolute;
+  left: -100%;
+}
+
+
+
+
+
+
+
+
+
+
+/* **************************************************************************** */
+/* **************************************************************************** */
+/* ***************************** B). Menu Section ***************************** */
+/* **************************************************************************** */
+/* **************************************************************************** */
+
+/* #home-page #demos-menu > ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  text-align: end;
+  margin: auto;
+  width: 100%;
+  height: 100%;
+}
+
+#home-page #demos-menu > ul > li {
+  list-style-type: none;
+  display: flex;
+  flex-direction: column;
+}
+
+#home-page #demos-menu > ul > li > a {
+  text-decoration: none;
+}
+
+.menu-item {
+  color: rgb(154, 193, 183);
+  margin-top: auto;
+  padding-bottom: 3px;
+}
+
+.menu-item:hover {
+  color: rgb(201, 234, 226);
+  font-weight: bold;
+} */
