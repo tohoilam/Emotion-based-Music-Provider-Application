@@ -31,7 +31,12 @@ const ChartsTheme = () => {
     },
     legends: {
       text: {
-        fill: colors.grey[100]
+        fill: colors.grey[100],
+      },
+      ticks: {
+        text: {
+          fill: colors.grey[100],
+        }
       }
     },
     tooltip: {

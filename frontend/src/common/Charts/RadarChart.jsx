@@ -1,4 +1,4 @@
-import { Box, useTheme } from '@mui/material';
+import { Box, Paper, useTheme } from '@mui/material';
 import { ResponsiveRadar } from '@nivo/radar'
 import { tokens } from '../../theme';
 import { BasicTooltip } from '@nivo/tooltip';
@@ -25,26 +25,29 @@ const mockData = [
 // no chart will be rendered.
 // website examples showcase many properties,
 // you'll often use just a few of them.
-const RadarChart = ({ data /* see data tab */ }) => {
+const RadarChart = ({ data, height, title, subtitle}) => {
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+
   const [chartsTheme, chartsEmotionColors] = ChartsTheme()
 
   const Radar = () => {
     return (
       <ResponsiveRadar
-          data={mockData}
+          data={data}
           theme={chartsTheme}
-          keys={[ 'percentage' ]}
+          keys={[ 'similarity' ]}
           indexBy="model"
           valueFormat=">-.2f"
           maxValue={1}
-          margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+          margin={{ top: 40, right: 80, bottom: 20, left: 80 }}
           borderColor={{ from: 'color' }}
-          gridLabelOffset={36}
-          dotSize={2}
+          gridLabelOffset={20}
+          dotSize={3}
           dotColor={{ theme: 'background' }}
           dotBorderWidth={2}
           colors={{ scheme: 'nivo' }}
-          blendMode="normal"
+          blendMode="lighten"
           motionConfig="wobbly"
           fillOpacity={0.85}
           // gridShape="linear"
@@ -52,7 +55,7 @@ const RadarChart = ({ data /* see data tab */ }) => {
               {
                   anchor: 'top-left',
                   direction: 'column',
-                  translateX: -50,
+                  translateX: -5000,
                   translateY: -40,
                   itemWidth: 80,
                   itemHeight: 20,
@@ -75,12 +78,12 @@ const RadarChart = ({ data /* see data tab */ }) => {
 
 
   return (
-    <Box m="20px">
-      <Header title="TESTING" subtitle="lololololololol"></Header>
-      <Box height="500px">
+    <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px"}} m="20px">
+      <Header title={title} subtitle={subtitle}></Header>
+      <Box height={height}>
         <Radar />
       </Box>
-    </Box>
+    </Paper>
   )
 }
 

@@ -1,6 +1,7 @@
 import os
 import copy
 import random
+import lyricsgenius
 import numpy as np
 from flask import request
 from flask import Blueprint
@@ -51,7 +52,7 @@ def getSongs():
   
 
 
-  if ('mode' not in request.form or request.form['mode'] not in ['audio', 'lyrics', 'combined']):
+  if ('mode' not in request.form or request.form['mode'] not in ['audio', 'combined', 'all']):
     errMsg = 'Mode of recommendation is not indicated'
     print('Failed: ' + errMsg)
     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
@@ -59,17 +60,17 @@ def getSongs():
   mode = request.form['mode']
     
 
-  lyrics_weighting = 0.5
+  text_weighting = 0.5
+
+  audio_result = SER_Predict_Full(request, fileList, filenameList, fixed_model_choice=MODEL_CHOICE)
+  audio_speech_info = audio_result['data'][0]
+  audio_emotion_percentages = audio_speech_info['percentage']
 
   # path to song_list
   if (mode == 'audio'):
     json_path = os.path.join('components', 'music_recommendation', 'songs_audio.json')
 
-    audio_result = SER_Predict_Full(request, fileList, filenameList, fixed_model_choice=MODEL_CHOICE)
-    audio_speech_info = audio_result['data'][0]
-    audio_emotion_percentages = audio_speech_info['percentage']
-
-    songList = getSongList(audio_emotion_percentages, mode, json_path, lyrics_weighting=lyrics_weighting, output_no=20)
+    songList = getSongList(mode, json_path, audio_emotion_percentages, text_weighting=text_weighting, output_no=20)
 
 
     returnData = {
@@ -82,22 +83,15 @@ def getSongs():
     audio_weighting = 0.5
 
     text_result = Text_Predict(request, fileList, filenameList)
-    print(text_result)
     text_speech_info = text_result['data'][0]
     text_emotion_percentages = text_speech_info["percentage"]
-
-    audio_result = SER_Predict_Full(request, fileList, filenameList, fixed_model_choice=MODEL_CHOICE)
-    print(audio_result)
-    audio_speech_info = audio_result['data'][0]
-    audio_emotion_percentages = audio_speech_info['percentage']
 
     combined_percentages = combineEmotionPercentages(audio_emotion_percentages, text_emotion_percentages, audio_weighting)
     combined_emotion = max(combined_percentages, key=combined_percentages.get)
 
     json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
 
-    songList = getSongList(audio_emotion_percentages, mode, json_path, lyrics_weighting=lyrics_weighting, output_no=20)
-    
+    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, output_no=20)
 
     returnData = {
       "speech_info": {
@@ -1788,6 +1782,14 @@ def dummy():
   }
 
 
+@music_recommendation_blueprint.route(PATH_DIR_NAME + '/getlyrics/<genius_id>')
+@cross_origin()
+def getLyrics(genius_id):
+  client_access_token = "e0td9KbZuLG8Tk8ai3szeLSOoUXUtkeB2JH5dRTg-bTGm2cFcbWn27henqJ1YOL_"
+  LyricsGenius = lyricsgenius.Genius(client_access_token)
+  lyrics = LyricsGenius.lyrics(int(genius_id))
+  return {'data': lyrics, 'status': 'ok', 'errMsg': ''}
+
 @music_recommendation_blueprint.route(PATH_DIR_NAME + '/testing')
 @cross_origin()
 def getSongsTesting():
@@ -1815,7 +1817,7 @@ def getSongsTesting():
   else:
     json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
 
-  songList = getSongList(emotion_percentages, mode, json_path, lyrics_weighting=lyrics_weighting, output_no=20)
+  songList = getSongList(mode, json_path, emotion_percentages, lyrics_weighting=lyrics_weighting, output_no=20)
 
   returnData = {
     "speech_info": speech_info,

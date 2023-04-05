@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react'
-// import { useMode } from '../../theme'
 
 import { RecordButton } from '../../common/RecordButton/RecordButton'
 import { HomeMusicRecommendation } from './HomeMusicRecommendation'
@@ -9,17 +8,19 @@ import DonutChart from '../../common/Charts/DonutChart'
 
 import MGApi from '../../routes/MGApi'
 import MRApi from '../../routes/MRApi'
+import { tokens } from '../../theme'
+
 
 import './HomePage.css'
-import { ThemeProvider, Container, Typography, Paper, Box, Tab, Button, Grid, Accordion, AccordionSummary, AccordionDetails } from '@mui/material'
-import { useTheme } from '@mui/material/styles';
+import { ThemeProvider, Container, Typography, Paper, Box, Tab, Button, Grid, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from '@mui/material'
+import { useTheme } from '@mui/material';
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
 
 export const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedAudioList, setGeneratedAudioList] = useState([]);
-  const [expandedInfo, setExpandedInfo] = useState(true);
+  const [expandedInfo, setExpandedInfo] = useState(false);
   const [musicInfoToDisplay, setMusicInfoToDisplay] = useState(null);
   const [speechInfo, setSpeechInfo] = useState(null);
   const [audioScatterData, setAudioScatterData] = useState([]);
@@ -28,18 +29,12 @@ export const HomePage = () => {
 
   const infoRef = useRef(null);
 
-  // const theme = useTheme();
-  // const theme = useTheme();
   const theme = useTheme();
-  // const theme = createTheme({
-  //   overrides: {
-  //     MuiAccordionSummary: {
-  //       content: {
-  //         margin: 0,
-  //       },
-  //     },
-  //   },
-  // });
+  const colors = tokens(theme.palette.mode);
+
+  const closeInfo = () => {
+    setExpandedInfo(false);
+  }
   
 
   const handleChange = (event, newValue) => {
@@ -49,6 +44,14 @@ export const HomePage = () => {
   useEffect(() => {
     console.log(musicInfoToDisplay);
   }, [musicInfoToDisplay]);
+
+  // useEffect(() => {
+  //   if (expandedInfo === true) {
+  //     setTimeout(() => {
+  //       infoRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  //     }, "300");
+  //   }
+  // }, [expandedInfo]);
 
 
   // const generateMusic = async () => {
@@ -68,28 +71,41 @@ export const HomePage = () => {
   // }
 
   return (
-    <ThemeProvider theme={theme}>
+    // <ThemeProvider theme={theme}>
     <TabContext id="home-page" value={tab}>
-      <Grid container sx={{ height: "100vh"}} direction="column" justifyContent="center" alignItems="stretch" wrap='nowrap'>
-        <Grid item xs={1}>
+      <Box sx={{ height: "100vh", width: "100%"}}>
+        {
+          (isLoading)
+          ? <Box align="center" sx={{ width: "100%", height: "100%", position: "fixed", bgcolor: "rgba(0, 0, 0, 0.6)", zIndex: "100"}}>
+              <CircularProgress size={50} thickness={3} sx={{mt: "45vh"}}></CircularProgress>
+              <Typography variant="h4" color={colors.greenAccent[600]}>analyzing...</Typography>
+              {
+                (recommendMode !== "audio")
+                  ? <Typography variant="text" color={colors.greenAccent[700]}>(approx. 1 minute)</Typography>
+                  : ""
+              }
+            </Box>
+          : ""
+        }
+        {/* <Grid item xs={1}> */}
           <Typography
             variant="h1"
-            sx={{ height: "10%", textAlign: "center"}}
+            sx={{ height: "70px", textAlign: "center", pt: "20px"}}
           >
             Emotion-based Music Provider
           </Typography>
-        </Grid>
-        <Grid item xs={1}>
+        {/* </Grid> */}
+        {/* <Grid item xs={1}> */}
           {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}> */}
             <TabList onChange={handleChange} aria-label="lab API tabs example" centered >
               <Tab sx={{ height: "10px", py: "0px"}} label="Music Recommendation" value="1" />
               <Tab sx={{ height: "10px", py: "0px"}} label="Music Generation" value="2" />
             </TabList>
           {/* </Box> */}
-        </Grid>
-        <Grid item xs={10} sx={{ height: "80%"}} >
-          <Container id="tabs" maxWidth="1600px" sx={{height: "100%", width: "100%" }}>
-            <TabPanel value="1" sx={{height: "95%"}}>
+        {/* </Grid> */}
+        {/* <Grid item xs={10} sx={{ height: "80%"}} > */}
+          <Container id="tabs" maxWidth="1600px" sx={{height: "calc(100% - 150px)", width: "100%" }}>
+            <TabPanel value="1" sx={{height: "100%", pt: 0}}>
               <HomeMusicRecommendation
                   setIsLoading={setIsLoading}
                   setExpandedInfo={setExpandedInfo}
@@ -99,11 +115,21 @@ export const HomePage = () => {
                   selectedMode={recommendMode}
                   setSelectedMode={setRecommendMode}
                   setAudioScatterData={setAudioScatterData}
+                  infoRef={infoRef}
               ></HomeMusicRecommendation>
               {/* <Box ref={infoRef} sx={{height: (expandedInfo) ? "100%" : "5%"}}>
                 <Paper sx={{height: "100%", mt: 3, bgcolor: theme.palette.secondary.main, borderRadius: "12px" }}></Paper>
               </Box> */}
-              <Paper sx={{ bgcolor: theme.palette.secondary.main, borderRadius: "6px", mt: 3, backgroundImage: "none", border: "1px solid rgba(255, 255, 255, 0.12)"}}>
+              <Paper 
+                sx={{
+                  bgcolor: theme.palette.secondary.main,
+                  borderRadius: "6px",
+                  mt: 3,
+                  backgroundImage: "none",
+                  border: "1px solid rgba(255, 255, 255, 0.12)"}
+                }
+                ref={infoRef}
+              >
                 <Accordion expanded={expandedInfo} square sx={{height: "100%", bgcolor: "rgba(0,0,0,0)", backgroundImage: "none"}}>
                   <AccordionSummary
                     sx={{borderRadius: "100px", bgcolor: "rgba(0,0,0,0)"}}
@@ -114,7 +140,7 @@ export const HomePage = () => {
                     <Typography sx={{ textAlign: "center", width: "100%"}}>More Info</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
-                    <Typography>
+                    {/* <Typography> */}
                       {
                         (musicInfoToDisplay)
                         ? <MusicRecommendationInfo
@@ -125,7 +151,15 @@ export const HomePage = () => {
                           />
                         : ""
                       }
-                    </Typography>
+                      <Button
+                        variant="text"
+                        align="center"
+                        sx={{bgcolor: colors.grey[800], width: "100%", height: "25px"}}
+                        onClick={closeInfo}
+                      >
+                        close info
+                      </Button>
+                    {/* </Typography> */}
                   </AccordionDetails>
                 </Accordion>
               </Paper>
@@ -133,10 +167,10 @@ export const HomePage = () => {
             </TabPanel>
             <TabPanel value="2">Item Two</TabPanel>
           </Container>
-        </Grid>
-      </Grid>
+        {/* </Grid> */}
+      </Box>
     </TabContext>
-    </ThemeProvider>
+    // </ThemeProvider>
 
   );
 

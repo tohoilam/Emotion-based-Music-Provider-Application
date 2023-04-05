@@ -4,8 +4,9 @@ import React, { useEffect, useState, useRef } from 'react'
 import { RecordButton } from '../../common/RecordButton/RecordButton'
 
 import MRApi from '../../routes/MRApi'
+import { tokens } from '../../theme';
 
-export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, selectedMode, setSelectedMode, setAudioScatterData}) => {
+export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, selectedMode, setSelectedMode, setAudioScatterData, infoRef}) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
@@ -17,6 +18,7 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 	const audioFileInputRef= useRef(null);
 
   const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   const dropFiles = (e) => {
 		e.preventDefault();
@@ -97,6 +99,9 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 
 
     setExpandedInfo(true);
+    setTimeout(() => {
+      infoRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, "300");
   }
 
   const emotionPercentagesToVA = (percentage) => {
@@ -145,104 +150,142 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
   }, [recordedAudio])
 
 
+  const EmotionItem = () => {
+    let emotionText = "";
+    let percentage = 0;
+
+    if (selectedMode === 'audio') {
+      if (speechInfo && 'audio' in speechInfo) {
+        emotionText = speechInfo['audio']['emotion'];
+        percentage = speechInfo['audio']['percentage'][emotionText];
+      }
+    }
+    else {
+      if (speechInfo && 'combined' in speechInfo) {
+        emotionText = speechInfo['combined']['emotion'];
+        percentage = speechInfo['combined']['percentage'][emotionText];
+      }
+    }
+
+    if (emotionText && percentage) {
+      const text = emotionText + " (" + toPercentageFormat(percentage).toString() + "%)"
+
+      return (
+        <Paper variant="outlined" sx={{ bgcolor: colors.emotion[emotionText], borderRadius: "20px", height: "100%" }}>
+          <Typography variant="h3" align="center" sx={{pt: "5px"}}>{text}</Typography>
+        </Paper>
+      )
+    }
+    else {
+      return "";
+    }
+    
+
+
+  }
+
   return (
     <Grid container spacing={3} sx={{height: "100%"}} alignItems="stretch" justifyContent="space-between" >
       <Grid item xs={12} sm={4} xl={3} sx={{ height: "100%"}}  >
-        <Grid container direction="column" sx={{ height: "100%"}} spacing={3} alignItems="stretch" justify="space-between" wrap="nowrap" >
-          {/* <Paper variant="outlined" xs={12} sx={{ height: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px" }}></Paper> */}
-        
-          <Grid item xs={9} sx={{ flexGrow: 1, overflowY: "auto"}}  >
-            <Paper variant="outlined" sx={{ height: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", p: 2, overflowY: "auto" }}>
-              <Grid container spacing={2}>
-                <Grid item xs="auto">
-                  <RecordButton setRecordedAudio={setRecordedAudio} diameter="60px" ></RecordButton>
-                </Grid>
-                <Grid item xs >
-                  <Typography align='center' sx={{marginTop: "15px"}}>or</Typography>
-                </Grid>
-                <Grid item xs={7} >
-                  <Button variant="contained" sx={{width: "100%", height: "50px", marginTop: "3px"}}
-                    onClick={() => {audioFileInputRef.current.click()}}
-                    onDragOver={(e) => {e.preventDefault();e.stopPropagation();setDropActive(true);e.target.classList.add('MuiButton-hover')}}
-                    onDragLeave={(e) => {setDropActive(false);e.target.classList.remove('MuiButton-hover')}}
-                    onDrop={(e) => {dropFiles(e)}}>
-                    Upload a File
-                  </Button>
-                  <input type="file" id="file-input" onChange={(e) => storeFiles(e.target.files)} ref={audioFileInputRef} />
-                </Grid>
+        <Paper variant="outlined" sx={{ height: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", p: 2, overflowY: "auto" }}>
+          <Grid container alignItems="flex-start" justifyContent="space-between" spacing={1} sx={{  p:1 }}>
+            <Grid item sx={{height: "100px", minWidth: "84px", m: 0}}>
+              <RecordButton setRecordedAudio={setRecordedAudio} diameter="84px" ></RecordButton>
+            </Grid>
+            <Grid item xs sx={{height: "100px"}} >
+              <Typography align='center' sx={{marginTop: "30px"}}>or</Typography>
+            </Grid>
+            <Grid item xs={7} sx={{height: "100px"}} >
+              <Button variant="contained" sx={{width: "100%", height: "50px", marginTop: "16px"}}
+                onClick={() => {audioFileInputRef.current.click()}}
+                onDragOver={(e) => {e.preventDefault();e.stopPropagation();setDropActive(true);e.target.classList.add('MuiButton-hover')}}
+                onDragLeave={(e) => {setDropActive(false);e.target.classList.remove('MuiButton-hover')}}
+                onDrop={(e) => {dropFiles(e)}}>
+                Upload a File
+              </Button>
+              <input type="file" id="file-input" onChange={(e) => storeFiles(e.target.files)} ref={audioFileInputRef} />
+            </Grid>
 
 
-                <Grid item xs={12} >
-                  {
-                    (recordedAudio && recordedAudio['blobUrl'])
-                    ? <audio src={recordedAudio['blobUrl']} controls style={{width: "100%", height: "50px" }} ></audio>
-                    : ""
-                  }
-                </Grid>
-                <Grid item xs={12} >
-                  <Button variant="contained" sx={{ height: "50px" }}>D</Button>
-                </Grid>
+            <Grid item xs={12} sx={{height: "85px"}}>
+              {
+                (recordedAudio && recordedAudio['blobUrl'])
+                ? <audio src={recordedAudio['blobUrl']} controls style={{width: "100%", height: "50px" }} ></audio>
+                : ""
+              }
+            </Grid>
 
 
-                <Grid item xs={4}>
-                  <Typography variant="h3" >Mode</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <FormControl fullWidth>
-                    <InputLabel id="mode-selection">Mode</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={selectedMode}
-                      label="Mode"
-                      onChange={changeMode}
-                    >
-                      <MenuItem value={'audio'}>Audio Only</MenuItem>
-                      <MenuItem value={'combined'}>Audio and Text</MenuItem>
-                      <MenuItem value={'all'}>Audio, Text, and Context</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
+            <Grid item xs={4} sx={{height: "70px"}}>
+              <Typography variant="h3" align="center" sx={{pt: "12px"}} >Mode</Typography>
+            </Grid>
+            <Grid item xs={8} sx={{height: "70px"}}>
+              <FormControl fullWidth>
+                <InputLabel id="mode-selection">Mode</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={selectedMode}
+                  label="Mode"
+                  onChange={changeMode}
+                  sx={{height: "50px"}}
+                >
+                  <MenuItem value={'audio'}>Audio Only</MenuItem>
+                  <MenuItem value={'combined'}>Audio and Text</MenuItem>
+                  <MenuItem value={'all'}>Audio, Text, and Context</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
 
-                <Grid item xs={4}>
-                  <Typography variant="h3" >Genre</Typography>
-                </Grid>
-                <Grid item xs={8}>
-                  <FormControl fullWidth>
-                    <InputLabel id="genre-selection">Genre</InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={genre}
-                      label="Genre"
-                      onChange={changeGenre}
-                    >
-                      <MenuItem value={"all"}>ALL</MenuItem>
-                      <MenuItem value={"pop"}>Pop</MenuItem>
-                      <MenuItem value={"rnb"}>R&B</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
+            <Grid item xs={4} sx={{height: "70px"}}>
+              <Typography variant="h3" align="center" sx={{pt: "12px"}} >Genre</Typography>
+            </Grid>
+            <Grid item xs={8} sx={{height: "70px"}}>
+              <FormControl fullWidth>
+                <InputLabel id="genre-selection">Genre</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={genre}
+                  label="Genre"
+                  onChange={changeGenre}
+                  sx={{height: "50px"}}
+                >
+                  <MenuItem value={"all"}>ALL</MenuItem>
+                  <MenuItem value={"pop"}>Pop</MenuItem>
+                  <MenuItem value={"rnb"}>R&B</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
 
-                <Grid item xs={12}>
-                  <Button variant="contained" sx={{ width: "100%" }} onClick={recommendMusic}>RECOMMEND MUSIC</Button>
-                </Grid>
-              </Grid>
-            </Paper>
+            <Grid item xs={12}>
+              <Button variant="contained" sx={{ width: "100%", height: "45px" }} onClick={recommendMusic} >RECOMMEND MUSIC</Button>
+            </Grid>
+
+            {
+              (speechInfo)
+                ? <Grid item xs={12} sx={{mt: 2}}>
+                    <Paper variant="outlined" sx={{backgroundColor: colors.grey[900], height: "120px", p: 2, pt: 2}}>
+                      <Typography variant="h3" color={colors.grey[100]} align="center" >
+                        Your emotion
+                      </Typography>
+                      <Box sx={{height: "40px", mt: 1}}>
+                        <EmotionItem />
+                      </Box>
+                    </Paper>
+                    
+                  </Grid>
+                : ""
+            }
           </Grid>
-          <Grid item xs={3} sx={{ flexGrow: 1 }}  >
-            <Paper variant="outlined" sx={{ height: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", p: 2 }}>
-              { (speechInfo && 'emotion' in speechInfo ) ? speechInfo['emotion'] : "" }
-            </Paper>
-          </Grid>
-        </Grid>
+        </Paper>
       </Grid>
       <Grid item xs={12} sm={8} xl={9} sx={{ height: "100%"}} >
         <Paper variant="outlined" sx={{ height: "100%", maxHeight: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", px: 2, py: 1, overflowY: "auto" }}>
           
                   
             {
-              (recommendedMusic !== [])
+              (recommendedMusic && recommendedMusic != [])
               ? recommendedMusic.map((music) => {
 
                 return (
@@ -265,7 +308,7 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
                         {
                           (predictMode === 'audio')
                             ? toPercentageFormat(music['audio']['similarity']).toString() + "%"
-                            : (predictMode === 'combined')
+                            : (predictMode === 'combined' || predictMode === 'all')
                               ? toPercentageFormat(music['combined']['similarity']).toString() + "%"
                               : "???"
                         }

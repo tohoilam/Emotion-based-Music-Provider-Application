@@ -1050,11 +1050,12 @@ const ScatterChart = ({ data, height, title, subtitle }) => {
           // colors={chartsEmotionColors}
           theme={chartsTheme}
           margin={{ top: 20, right: 140, bottom: 60, left: 90 }}
-          xScale={{ type: 'linear', min: -1, max: 'auto' }}
+          xScale={{ type: 'linear', min: -1, max: 1 }}
           xFormat=">-.2f"
           yScale={{ type: 'linear', min: -1, max: 1 }}
           yFormat=">-.2f"
-          colors={{ scheme: 'nivo' }}
+          // colors={{ scheme: 'nivo' }}
+          colors={["rgb(227, 194, 164", colors.blueAccent[500], colors.redAccent[500]]}
           nodeSize={10}
           axisTop={null}
           axisRight={null}
