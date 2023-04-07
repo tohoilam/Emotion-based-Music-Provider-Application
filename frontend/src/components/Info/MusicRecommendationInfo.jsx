@@ -230,9 +230,9 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
       </Grid>
       {
         (recommendMode !== 'audio' && musicInfoToDisplay && speechInfo)
-          ? <Grid item xs={6}>
-              <Typography variant="h2">{musicInfoToDisplay['song_name']}</Typography>
-              <Typography variant="h3" color={colors.greenAccent[300]}>{musicInfoToDisplay['artist']}</Typography>
+          ? <Grid item xs={8}>
+              <Typography variant="h2">Song Name: {musicInfoToDisplay['song_name']}</Typography>
+              <Typography variant="h3" color={colors.greenAccent[300]}>Artist: {musicInfoToDisplay['artist']}</Typography>
               <iframe title={musicInfoToDisplay['spotify_id']} src={"https://open.spotify.com/embed/track/" + musicInfoToDisplay['spotify_id']} width="100%" height="100px" frameBorder="0"></iframe>
               <Grid
                 container
@@ -266,37 +266,148 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
                   </Paper>
                 </Grid>
 
-                <Grid item xs={6} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                <Grid item xs={(recommendMode === "combined") ? 6 : 4} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
                   <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
-                    Song match:
+                    Overall Similarity:
                   </Typography>
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={(recommendMode === "combined") ? 6 : 2}>
                   <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
                     <Typography variant="h3" align="center">
                       {
                         (recommendMode === "combined")
                           ? musicInfoToDisplay['combined']['similarity']
-                          : "100%"
+                          : "TODO"
                       }
                     </Typography>
                   </Paper>
                 </Grid>
+
+                <Grid item xs={4} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                  <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
+                    Acoustic Similarity:
+                  </Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
+                    <Typography variant="h3" align="center">
+                      {
+                        toPercentageFormat(musicInfoToDisplay['audio']['similarity']).toString() + "%"
+                      }
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={4} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                  <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
+                    Text Similarity:
+                  </Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
+                    <Typography variant="h3" align="center">
+                      {
+                        toPercentageFormat(musicInfoToDisplay['lyrics']['similarity']).toString() + "%"
+                      }
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+                {
+                  (recommendMode === "all")
+                    ? <Grid item xs={4} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                        <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
+                          Semantics Similarity:
+                        </Typography>
+                      </Grid>
+                    : ""
+                }
+
+                {
+                  (recommendMode === "all")
+                    ? <Grid item xs={2}>
+                        <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
+                          <Typography variant="h3" align="center">
+                            {
+                              "TODO"
+                              // toPercentageFormat(musicInfoToDisplay['semantics']['similarity']).toString() + "%"
+                            }
+                          </Typography>
+                        </Paper>
+                      </Grid>
+                    : ""
+                }
               </Grid>
             </Grid>
-          : ""
+          : <Grid item xs={12}>
+              <Grid
+                container
+                spacing={1}
+                direction="row"
+                justify="flex-start"
+                alignItems="flex-start"
+                alignContent="stretch"
+              >
+                <Grid item xs={6} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                  <Typography variant="h2">Song Name: {musicInfoToDisplay['song_name']}</Typography>
+                  <Typography variant="h3" color={colors.greenAccent[300]}>Artist: {musicInfoToDisplay['artist']}</Typography>
+                </Grid>
+                <Grid item xs={6}>
+                  <iframe title={musicInfoToDisplay['spotify_id']} src={"https://open.spotify.com/embed/track/" + musicInfoToDisplay['spotify_id']} width="100%" height="80px" frameBorder="0"></iframe>
+                </Grid>
+                <Grid item xs={3} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                  <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
+                    Your emotion:
+                  </Typography>
+                </Grid>
+                <Grid item xs={3}>
+                  <Paper 
+                    variant="outlined" 
+                    sx={{
+                      backgroundColor: colors.emotion[speechInfo['audio']['emotion']],
+                      p: 1,
+                      borderRadius: "6px"
+                    }}>
+                      <Typography variant="h3" align="center">
+                        {
+                          speechInfo['audio']['emotion']
+                            + " ("
+                            + toPercentageFormat(speechInfo['audio']['percentage'][speechInfo['audio']['emotion']]).toString()
+                            + "%)"
+                        }
+                      </Typography>
+                  </Paper>
+                </Grid>
+
+                <Grid item xs={4} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                  <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
+                    Similarity:
+                  </Typography>
+                </Grid>
+                <Grid item xs={2}>
+                  <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
+                    <Typography variant="h3" align="center">
+                      {
+                        toPercentageFormat(musicInfoToDisplay['audio']['similarity']).toString() + "%"
+                      }
+                    </Typography>
+                  </Paper>
+                </Grid>
+
+              </Grid>
+            </Grid>
       }
       {
         (recommendMode !== 'audio' && similarityRadarData)
-          ? <Grid item xs={6}>
-              <RadarChart data={similarityRadarData} height="300px" title="Radar" subtitle="Idkkkk" />
+          ? <Grid item xs={4}>
+              <RadarChart data={similarityRadarData} height="250px" title="Speech and Song Similarity"/>
             </Grid>
           : ""
       }
 
 
       <Grid item xs={12} >
-        <Typography variant="h1">
+        <Typography variant="h1" mt={7}>
           Audio & Acoustics Analysis
         </Typography>
       </Grid>
