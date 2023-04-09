@@ -78,10 +78,10 @@ export const HomePage = () => {
           (isLoading)
           ? <Box align="center" sx={{ width: "100%", height: "100%", position: "fixed", bgcolor: "rgba(0, 0, 0, 0.6)", zIndex: "100"}}>
               <CircularProgress size={50} thickness={3} sx={{mt: "45vh"}}></CircularProgress>
-              <Typography variant="h4" color={colors.greenAccent[600]}>analyzing...</Typography>
+              <Typography variant="h4" color={colors.primary[500]}>analyzing...</Typography>
               {
                 (recommendMode !== "audio")
-                  ? <Typography variant="text" color={colors.greenAccent[700]}>(approx. 1 minute)</Typography>
+                  ? <Typography variant="text" color={colors.primary[600]}>(approx. 1 minute)</Typography>
                   : ""
               }
             </Box>
@@ -91,14 +91,37 @@ export const HomePage = () => {
           <Typography
             variant="h1"
             sx={{ height: "70px", textAlign: "center", pt: "20px"}}
+            color={colors.grey[100]}
           >
             Emotion-based Music Provider
           </Typography>
         {/* </Grid> */}
         {/* <Grid item xs={1}> */}
           {/* <Box sx={{ borderBottom: 1, borderColor: 'divider' }}> */}
-            <TabList onChange={handleChange} aria-label="lab API tabs example" centered >
-              <Tab sx={{ height: "10px", py: "0px"}} label="Music Recommendation" value="1" />
+            <TabList
+              onChange={handleChange}
+              TabIndicatorProps={{ color: colors.primary[100] }}
+              aria-label="music recommendation or music generation"
+              centered
+              
+            >
+              <Tab 
+                sx={{ 
+                  height: "10px",
+                  py: "0px",
+                  // color: 
+                  '.Mui-selected' : {
+                    color: colors.primary[200],
+                  },
+                  "& .MuiTab-root.Mui-selected": {
+                    color: 'red'
+                  }
+                }}
+                textColor={colors.primary[200]}
+                indicatorColor={colors.primary[200]}
+                label="Music Recommendation"
+                value="1"
+              />
               <Tab sx={{ height: "10px", py: "0px"}} label="Music Generation" value="2" />
             </TabList>
           {/* </Box> */}
@@ -112,8 +135,8 @@ export const HomePage = () => {
                   setMusicInfoToDisplay={setMusicInfoToDisplay}
                   setSpeechInfo={setSpeechInfo}
                   speechInfo={speechInfo}
-                  selectedMode={recommendMode}
-                  setSelectedMode={setRecommendMode}
+                  recommendMode={recommendMode}
+                  setRecommendMode={setRecommendMode}
                   setAudioScatterData={setAudioScatterData}
                   infoRef={infoRef}
               ></HomeMusicRecommendation>
@@ -122,7 +145,7 @@ export const HomePage = () => {
               </Box> */}
               <Paper 
                 sx={{
-                  bgcolor: theme.palette.secondary.main,
+                  bgcolor: theme.palette.background.paper,
                   borderRadius: "6px",
                   mt: 3,
                   backgroundImage: "none",
@@ -130,14 +153,14 @@ export const HomePage = () => {
                 }
                 ref={infoRef}
               >
-                <Accordion expanded={expandedInfo} square sx={{height: "100%", bgcolor: "rgba(0,0,0,0)", backgroundImage: "none"}}>
+                <Accordion expanded={expandedInfo} square sx={{height: "100%", bgcolor: "rgba(0,0,0,0)", backgroundImage: "none", cursor: "default"}}>
                   <AccordionSummary
-                    sx={{borderRadius: "100px", bgcolor: "rgba(0,0,0,0)"}}
+                    sx={{borderRadius: "100px", bgcolor: "rgba(0,0,0,0)", cursor: "default"}}
                     // expandIcon={<ExpandMoreIcon />}
                     aria-controls="panel1a-content"
                     id="panel1a-header"
                   >
-                    <Typography sx={{ textAlign: "center", width: "100%"}}>More Info</Typography>
+                    <Typography sx={{ textAlign: "center", width: "100%", pt: "7px", pb: "3px", fontSize: "0.9rem"}}>MORE INFO</Typography>
                   </AccordionSummary>
                   <AccordionDetails>
                     {/* <Typography> */}

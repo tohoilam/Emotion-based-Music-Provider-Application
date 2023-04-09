@@ -523,7 +523,17 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
       {
         (recommendMode !== "audio" && speechText)
           ? <Grid item xs={6}>
-              <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px", height: "400px"}} m="20px">
+              <Paper
+                variant="outlined"
+                sx={{
+                  backgroundColor: colors.greenAccent[800],
+                  background: `linear-gradient(45deg, ${colors.primary[700]}, ${colors.purplePinkAccent[800]})`,
+                  p: 2,
+                  borderRadius: "6px",
+                  height: "400px"
+                }}
+                m="20px"
+              >
                 <Header title="Speech Transcript" subtitle="Transcript recognized from your speech audio"></Header>
                 <Paper variant="outlined" sx={{backgroundColor: colors.blueAccent[900], p: 2, borderRadius: "6px", height: "270px", mt: "20px", overflow: "auto"}} mt="10px" >
                   <Typography variant="h5">{speechText}</Typography>
@@ -535,7 +545,17 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
       {
         (recommendMode !== "audio")
           ? <Grid item xs={6}>
-              <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px", height: "400px"}} m="20px">
+              <Paper
+                variant="outlined"
+                sx={{
+                  backgroundColor: colors.greenAccent[800],
+                  background: `linear-gradient(45deg, ${colors.primary[700]}, ${colors.purplePinkAccent[800]})`,
+                  p: 2,
+                  borderRadius: "6px",
+                  height: "400px"
+                }}
+                m="20px"
+              >
                 <Header title="Selected Song Lyrics" subtitle="Lyrics from Genius"></Header>
                 <Paper variant="outlined" sx={{backgroundColor: colors.blueAccent[900], p: 2, borderRadius: "6px", height: "270px", mt: "20px", overflow: "auto"}} mt="10px" >
                   <Typography variant="h5">
@@ -570,7 +590,17 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
       {
         (recommendMode === "all")
           ? <Grid item xs={3}>
-              <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px", height: "498px"}} m="20px">
+              <Paper
+                variant="outlined"
+                sx={{
+                  backgroundColor: colors.greenAccent[800],
+                  background: `linear-gradient(45deg, ${colors.primary[700]}, ${colors.purplePinkAccent[800]})`,
+                  p: 2,
+                  borderRadius: "6px",
+                  height: "498px"
+                }}
+                m="20px"
+              >
                 <Header title="Speech Keywords" subtitle="Significance of Speech Keywords"></Header>
                 <Grid
                   container
@@ -634,7 +664,17 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
       {
         (recommendMode === "all")
           ? <Grid item xs={3}>
-              <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px", height: "498px"}} m="20px">
+              <Paper
+                variant="outlined"
+                sx={{
+                  backgroundColor: colors.greenAccent[800],
+                  background: `linear-gradient(45deg, ${colors.primary[700]}, ${colors.purplePinkAccent[800]})`,
+                  p: 2,
+                  borderRadius: "6px",
+                  height: "498px"
+                }}
+                m="20px"
+              >
                 <Header title="Lyrics Keywords" subtitle="Significance of Lyrics Keywords"></Header>
                 <Grid
                   container

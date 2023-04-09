@@ -183,7 +183,16 @@ const DonutChart = ({data, height, title, subtitle}) => {
     
     
   return (
-    <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px"}} m="20px">
+    <Paper
+      variant="outlined"
+      sx={{
+        backgroundColor: colors.primary[900],
+        p: 2,
+        borderRadius: "6px",
+        background: `linear-gradient(45deg, ${colors.primary[700]}, ${colors.purplePinkAccent[800]})`
+      }}
+      m="20px"
+    >
       <Header title={title} subtitle={subtitle}></Header>
       <Box height={height}>
         <Donut />

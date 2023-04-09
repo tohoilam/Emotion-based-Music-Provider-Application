@@ -3,16 +3,20 @@ import React, { useEffect, useState, useRef } from 'react'
 
 import { RecordButton } from '../../common/RecordButton/RecordButton'
 
+import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
+import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+
 import MRApi from '../../routes/MRApi'
 import { tokens } from '../../theme';
 
-export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, selectedMode, setSelectedMode, setAudioScatterData, infoRef}) => {
+export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, recommendMode, setRecommendMode, setAudioScatterData, infoRef}) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
   const [recommendedMusic, setRecommendedMusic] = useState([]);
   const [genre, setGenre] = useState("pop");
-  const [predictMode, setPredictMode] = useState('');
+  const [selectedMode, setSelectedMode] = useState('audio');
 
   const [dropActive, setDropActive] = useState([]);
 	const audioFileInputRef= useRef(null);
@@ -33,28 +37,34 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 
     setIsLoading(true);
     const file = files[0];
-    // if (file.type != 'audio/wav' || file.type != 'audio/x-m4a' || file.type != 'audio/mpeg'  || file.type != 'audio/ogg')
-    if (file.type !== 'audio/wav' && file.type !== 'audio/x-m4a'
-      && file.type !== 'audio/mpeg' && file.type !== 'audio/ogg'
-      && file.type !== 'audio/basic') {
-      
-      const errMsg = "Please only upload .wav, .m4a, .mp3, .ogg, .opus, or .au file type!";
-      alert(errMsg);
+
+    if (file === undefined || file === null) {
+      setIsLoading(false);
     }
     else {
-      let blobUrl = (window.URL || window.webkitURL).createObjectURL(file);
+      // if (file.type != 'audio/wav' || file.type != 'audio/x-m4a' || file.type != 'audio/mpeg'  || file.type != 'audio/ogg')
+      if (file.type !== 'audio/wav' && file.type !== 'audio/x-m4a'
+        && file.type !== 'audio/mpeg' && file.type !== 'audio/ogg'
+        && file.type !== 'audio/basic') {
+        
+        const errMsg = "Please only upload .wav, .m4a, .mp3, .ogg, .opus, or .au file type!";
+        alert(errMsg);
+      }
+      else {
+        let blobUrl = (window.URL || window.webkitURL).createObjectURL(file);
 
-      const audioObject = {
-        blob: file,
-        blobUrl: blobUrl,
-        fileName: file.name,
-        className: "0",
+        const audioObject = {
+          blob: file,
+          blobUrl: blobUrl,
+          fileName: file.name,
+          className: "0",
+        }
+
+        setRecordedAudio(audioObject);
       }
 
-      setRecordedAudio(audioObject);
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
 
 	}
 
@@ -132,7 +142,8 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 
     setSpeechInfo(speechInfo);
     setRecommendedMusic(songList);
-    setPredictMode(selectedMode);
+    setRecommendMode(selectedMode);
+    
     setIsLoading(false);
   }
 
@@ -142,7 +153,6 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 
   const changeMode = (event) => {
     setSelectedMode(event.target.value);
-    console.log(event.target.value);
   };
 
   useEffect(() => {
@@ -154,7 +164,7 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
     let emotionText = "";
     let percentage = 0;
 
-    if (selectedMode === 'audio') {
+    if (recommendMode === 'audio') {
       if (speechInfo && 'audio' in speechInfo) {
         emotionText = speechInfo['audio']['emotion'];
         percentage = speechInfo['audio']['percentage'][emotionText];
@@ -186,8 +196,8 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
 
   return (
     <Grid container spacing={3} sx={{height: "100%"}} alignItems="stretch" justifyContent="space-between" >
-      <Grid item xs={12} sm={4} xl={3} sx={{ height: "100%"}}  >
-        <Paper variant="outlined" sx={{ height: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", p: 2, overflowY: "auto" }}>
+      <Grid item xs={12} sm={4} xl={3} sx={{ height: "100%", overflowY: "auto"}}  >
+        <Paper variant="outlined" sx={{ bgcolor: theme.palette.background.paper, borderRadius: "6px", p: 2, overflowY: "auto" }}>
           <Grid container alignItems="flex-start" justifyContent="space-between" spacing={1} sx={{  p:1 }}>
             <Grid item sx={{height: "100px", minWidth: "84px", m: 0}}>
               <RecordButton setRecordedAudio={setRecordedAudio} diameter="84px" ></RecordButton>
@@ -196,7 +206,14 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
               <Typography align='center' sx={{marginTop: "30px"}}>or</Typography>
             </Grid>
             <Grid item xs={7} sx={{height: "100px"}} >
-              <Button variant="contained" sx={{width: "100%", height: "50px", marginTop: "16px"}}
+              <Button
+                variant="contained"
+                sx={{
+                  width: "100%",
+                  height: "50px",
+                  marginTop: "16px",
+                }}
+                startIcon={<FileUploadOutlinedIcon />}
                 onClick={() => {audioFileInputRef.current.click()}}
                 onDragOver={(e) => {e.preventDefault();e.stopPropagation();setDropActive(true);e.target.classList.add('MuiButton-hover')}}
                 onDragLeave={(e) => {setDropActive(false);e.target.classList.remove('MuiButton-hover')}}
@@ -259,13 +276,24 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
             </Grid>
 
             <Grid item xs={12}>
-              <Button variant="contained" sx={{ width: "100%", height: "45px" }} onClick={recommendMusic} >RECOMMEND MUSIC</Button>
+              <Button
+                variant="contained"
+                sx={{
+                  width: "100%",
+                  height: "45px",
+                }}
+                onClick={recommendMusic}
+                startIcon={<MusicNoteIcon />}
+              >
+                RECOMMEND MUSIC
+              </Button>
             </Grid>
-
-            {
+          </Grid>
+        </Paper>
+        {
               (speechInfo)
                 ? <Grid item xs={12} sx={{mt: 2}}>
-                    <Paper variant="outlined" sx={{backgroundColor: colors.grey[900], height: "120px", p: 2, pt: 2}}>
+                    <Paper variant="outlined" sx={{backgroundColor: colors.background.paper, height: "120px", p: 2, pt: 2, borderRadius: "6px"}}>
                       <Typography variant="h3" color={colors.grey[100]} align="center" >
                         Your emotion
                       </Typography>
@@ -277,11 +305,9 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
                   </Grid>
                 : ""
             }
-          </Grid>
-        </Paper>
       </Grid>
       <Grid item xs={12} sm={8} xl={9} sx={{ height: "100%"}} >
-        <Paper variant="outlined" sx={{ height: "100%", maxHeight: "100%", bgcolor: theme.palette.secondary.main, borderRadius: "6px", px: 2, py: 1, overflowY: "auto" }}>
+        <Paper variant="outlined" sx={{ height: "100%", maxHeight: "100%", bgcolor: theme.palette.background.paper, borderRadius: "6px", px: 2, py: 1, overflowY: "auto" }}>
           
                   
             {
@@ -301,19 +327,32 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
                     key={music['spotify_id']}
                   >
                     <Grid item xs={10}>
-                      <iframe title={music['spotify_id']} src={"https://open.spotify.com/embed/track/" + music['spotify_id']} width="100%" height="100px" frameBorder="0"></iframe>
+                      <iframe 
+                        title={music['spotify_id']}
+                        src={"https://open.spotify.com/embed/track/" + music['spotify_id']}
+                        width="100%"
+                        height="100px"
+                        frameBorder="0"
+                      ></iframe>
                     </Grid>
                     <Grid item xs={2}>
                       <Typography variant="h3" align="center" pt="3px" sx={{height: "40px", mt: "3px"}}>
                         {
-                          (predictMode === 'audio')
+                          (recommendMode === 'audio')
                             ? toPercentageFormat(music['audio']['similarity']).toString() + "%"
-                            : (predictMode === 'combined' || predictMode === 'all')
+                            : (recommendMode === 'combined' || recommendMode === 'all')
                               ? toPercentageFormat(music['combined']['similarity']).toString() + "%"
                               : "???"
                         }
                       </Typography>
-                      <Button variant="contained" sx={{height: "35px", width: "100%"}} onClick={(e) => moreInfo(music)} >
+                      <Button
+                        variant="contained"
+                        sx={{
+                          height: "35px",
+                          width: "100%",
+                        }}
+                        onClick={(e) => moreInfo(music)}
+                      >
                         More
                       </Button>
                     </Grid>
