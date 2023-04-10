@@ -3,8 +3,8 @@ import $ from 'jquery'
 import EBMPApi from './EBMPApi'
 
 const getMusicRecommendation = async (formData) => {
-	const url = EBMPApi.getDomain() + 'music-recommendation/getsongs';
-	// const url = EBMPApi.getDomain() + 'music-recommendation/dummy';
+	// const url = EBMPApi.getDomain() + 'music-recommendation/getsongs';
+	const url = EBMPApi.getDomain() + 'music-recommendation/dummy';
 
 	const result = await $.ajax(url, {
 		type: 'POST',

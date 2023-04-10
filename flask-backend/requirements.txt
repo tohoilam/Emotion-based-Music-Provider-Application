@@ -13,6 +13,7 @@ lyricsgenius==3.0.1
 Markdown==3.4.1
 MarkupSafe==2.1.2
 matplotlib==3.6.3
+muspy==0.5.0
 noisereduce==2.0.1
 numpy==1.23.5
 opencv-python-headless==4.5.5.64

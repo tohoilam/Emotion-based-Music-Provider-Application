@@ -1,16 +1,24 @@
-import { Stack, Grid, Typography, Paper, Box, Button, useTheme, FormControl, InputLabel, Select, MenuItem, Card, CardContent, CardActions } from '@mui/material';
 import React, { useEffect, useState, useRef } from 'react'
 
-import { RecordButton } from '../../common/RecordButton/RecordButton'
-
+import { Grid, Typography, Paper, Box, Button, useTheme, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
-import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 
+import { RecordButton } from '../../common/RecordButton/RecordButton'
 import MRApi from '../../routes/MRApi'
 import { tokens } from '../../theme';
 
-export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusicInfoToDisplay, setSpeechInfo, speechInfo, recommendMode, setRecommendMode, setAudioScatterData, infoRef}) => {
+export const HomeMusicRecommendation = ({
+    setIsLoading,
+    setExpandedInfo,
+    setMusicInfoToDisplay,
+    setSpeechInfo,
+    speechInfo,
+    recommendMode,
+    setRecommendMode,
+    setAudioScatterData,
+    infoRef
+  }) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
@@ -189,9 +197,6 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
     else {
       return "";
     }
-    
-
-
   }
 
   return (
@@ -361,89 +366,8 @@ export const HomeMusicRecommendation = ({setIsLoading, setExpandedInfo, setMusic
               })
               : ""
             }
-
-          {/* </Grid> */}
         </Paper>
       </Grid>
      </Grid>
   )
-
-
-  // return (
-  //   <section id="Music-Recommendation" className="home-page-tab">
-  //     <section id="contols-section">
-  //       <div id="record-button-container">
-  //         <RecordButton setRecordedAudio={setRecordedAudio}></RecordButton>
-  //       </div>
-  //       <section id="file-upload">
-  //         <h1 className="file-upload-header">File Upload</h1>
-  //         <form id="upload-form" action="#" drop-active={dropActive.toString()}
-  //                   onClick={() => {audioFileInputRef.current.click()}}
-  //                   onDragOver={(e) => {e.preventDefault();e.stopPropagation();setDropActive(true)}}
-  //                   onDragLeave={() => {setDropActive(false)}}
-  //                   onDrop={(e) => {dropFiles(e)}}>
-  //           <i className="fas fa-cloud-upload-alt"></i>
-  //           <p>Browse File to Upload</p>
-  //         </form>
-  //         <input type="file" id="file-input" onChange={(e) => storeFiles(e.target.files)} ref={audioFileInputRef} multiple />
-  //       </section>
-  //       <select name="genre-selection" id="genre-selection" defaultValue={1} >
-  //         <option disabled value> -- select a genre -- </option>
-  //         <option key='pop' value='pop'>Pop</option>
-  //         <option key='rnb' value='rnb'>R&B</option>
-  //       </select>
-  //       <div id="mode-toggle-box" >
-  //         <h2 id="mode-header">Language</h2>
-  //         <div className="switch-box">
-  //           <div className="switch-label">English</div>
-  //           <label className="switch">
-  //             <input type="checkbox" defaultChecked={true} onChange={() => {setWithText(!withText)}} />
-  //             <span className="slider round"></span>
-  //           </label>
-  //         </div>
-  //       </div>
-  //       <div id="predict-box">
-  //         <button id="recommend-button" onClick={recommendMusic}>Recommend Music</button>
-  //         {/* <button id="generate-button" onClick={generateMusic}>Generate New Music</button> */}
-  //       </div>
-  //       {
-  //         (emotion)
-  //         ? <div id="predicted-emotion">{emotion}</div>
-  //         : ""
-  //       }
-  //       {
-  //         (emotionPercentage)
-  //         ? <div id="predicted-emotion-percentage">{emotionPercentage}</div>
-  //         : ""
-  //       }
-  //     </section>
-  //     <section id="music-provider-section">
-  //       <div id="music-board">
-          // {
-          //   (recommendedMusic !== [])
-          //   ? recommendedMusic.map((music) => {
-
-          //     return (
-          //       <iframe title={music[0]} src={"https://open.spotify.com/embed/track/" + music[0]} width="225" height="152" frameBorder="0"></iframe>
-          //     )
-          //   })
-          //   : ""
-          // }
-  //         {/* {
-  //           (generatedAudioList !== [])
-  //           ? generatedAudioList.map(generatedAudio => {
-  //               return (
-  //                 <div>
-  //                   <audio src={generatedAudio} id="generated-audio" controls></audio>
-  //                   <a href={generatedAudio} download="test.wav">Download</a>
-  //                 </div>
-  //               )
-  //           })
-            
-  //           : ""
-  //         } */}
-  //       </div>
-  //     </section>
-  //   </section>
-  // )
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 
 import { RecordButton } from '../../common/RecordButton/RecordButton'
 import { HomeMusicRecommendation } from './HomeMusicRecommendation'
+import { HomeMusicGeneration } from './HomeMusicGeneration'
 import { MusicRecommendationInfo } from '../Info/MusicRecommendationInfo'
 import DonutChart from '../../common/Charts/DonutChart'
 
@@ -16,15 +17,18 @@ import { ThemeProvider, Container, Typography, Paper, Box, Tab, Button, Grid, Ac
 import { useTheme } from '@mui/material';
 
 import { TabContext, TabList, TabPanel } from '@mui/lab'
+import { MusicGenerationInfo } from '../Info/MusicGenerationInfo'
 
 export const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedAudioList, setGeneratedAudioList] = useState([]);
   const [expandedInfo, setExpandedInfo] = useState(false);
   const [musicInfoToDisplay, setMusicInfoToDisplay] = useState(null);
+  const [generatedMusicInfoToDisplay, setGeneratedMusicInfoToDisplay] = useState(null);
   const [speechInfo, setSpeechInfo] = useState(null);
   const [audioScatterData, setAudioScatterData] = useState([]);
   const [recommendMode, setRecommendMode] = useState('audio');
+  const [generateMode, setGenerateMode] = useState('monophonic');
   const [tab, setTab] = React.useState('1');
 
   const infoRef = useRef(null);
@@ -44,6 +48,16 @@ export const HomePage = () => {
   useEffect(() => {
     console.log(musicInfoToDisplay);
   }, [musicInfoToDisplay]);
+
+  useEffect(() => {
+    console.log(tab)
+    if (tab === "2") {
+      document.body.style.backgroundImage = "linear-gradient(45deg, rgb(17, 27, 52), rgb(104, 51, 82) 50%, rgb(20, 32, 81))";
+    }
+    else {
+      document.body.style.backgroundImage = "linear-gradient(45deg, rgb(5 71 75), rgb(140 95 95) 50%, rgb(9 75 77))";
+    }
+  }, [tab])
 
   // useEffect(() => {
   //   if (expandedInfo === true) {
@@ -140,9 +154,6 @@ export const HomePage = () => {
                   setAudioScatterData={setAudioScatterData}
                   infoRef={infoRef}
               ></HomeMusicRecommendation>
-              {/* <Box ref={infoRef} sx={{height: (expandedInfo) ? "100%" : "5%"}}>
-                <Paper sx={{height: "100%", mt: 3, bgcolor: theme.palette.secondary.main, borderRadius: "12px" }}></Paper>
-              </Box> */}
               <Paper 
                 sx={{
                   bgcolor: theme.palette.background.paper,
@@ -188,7 +199,64 @@ export const HomePage = () => {
               </Paper>
               
             </TabPanel>
-            <TabPanel value="2">Item Two</TabPanel>
+            <TabPanel value="2" sx={{height: "100%", pt: 0}}>
+              <HomeMusicGeneration
+                    setIsLoading={setIsLoading}
+                    setExpandedInfo={setExpandedInfo}
+                    setGeneratedMusicInfoToDisplay={setGeneratedMusicInfoToDisplay}
+                    setSpeechInfo={setSpeechInfo}
+                    speechInfo={speechInfo}
+                    generateMode={generateMode}
+                    setGenerateMode={setGenerateMode}
+                    infoRef={infoRef}
+                ></HomeMusicGeneration>
+                <Paper 
+                  sx={{
+                    bgcolor: theme.palette.background.paper,
+                    borderRadius: "6px",
+                    mt: 3,
+                    backgroundImage: "none",
+                    border: "1px solid rgba(255, 255, 255, 0.12)"}
+                  }
+                  ref={infoRef}
+                >
+                  <Accordion expanded={expandedInfo} square sx={{height: "100%", bgcolor: "rgba(0,0,0,0)", backgroundImage: "none", cursor: "default"}}>
+                    <AccordionSummary
+                      sx={{borderRadius: "100px", bgcolor: "rgba(0,0,0,0)", cursor: "default"}}
+                      // expandIcon={<ExpandMoreIcon />}
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                    >
+                      <Typography sx={{ textAlign: "center", width: "100%", pt: "7px", pb: "3px", fontSize: "0.9rem"}}>MORE INFO</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      {/* <Typography> */}
+                        {
+                          (musicInfoToDisplay)
+                          ? <MusicRecommendationInfo
+                                speechInfo={speechInfo}
+                                musicInfoToDisplay={musicInfoToDisplay}
+                                recommendMode={recommendMode}
+                                audioScatterData={audioScatterData}
+                            />
+                          : <MusicGenerationInfo
+                                speechInfo={speechInfo}
+                                generatedMusicInfoToDisplay={generatedMusicInfoToDisplay}
+                            />
+                        }
+                        <Button
+                          variant="text"
+                          align="center"
+                          sx={{bgcolor: colors.grey[800], width: "100%", height: "25px"}}
+                          onClick={closeInfo}
+                        >
+                          close info
+                        </Button>
+                      {/* </Typography> */}
+                    </AccordionDetails>
+                  </Accordion>
+                </Paper>
+            </TabPanel>
           </Container>
         {/* </Grid> */}
       </Box>
