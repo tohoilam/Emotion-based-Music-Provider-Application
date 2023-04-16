@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import math
+from components.music_recommendation import semantics
 from scipy.spatial import minkowski_distance
 
 # this is used to combine audio and text v-a
@@ -24,12 +25,12 @@ def combine_values(audio_result, text_result, domain, text_weighting):
     return v_weighted, a_weighted, confidence
 
 # call this to get song
-def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {}, text_weighting: float = 0.5, output_no=-1):
+def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {}, text_weighting: float = 0.5, text = "", output_no=-1):
     def last_entry(entry, mode):
-        if (mode == 'audio'):
-            return entry['audio']['similarity']
+        if mode == 'audio':
+            return entry[mode]['similarity']
         else:
-            return entry['combined']['similarity']
+            return entry[mode]['similarity']
 
     def emotion_label(valence, arousal):
         if valence >= 0 and arousal >= 0:
@@ -77,7 +78,7 @@ def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {},
             continue
 
         # lyrics mode: use both audio & text information
-        else:
+        elif mode != 'lyrics':
             speech_text_happy = speech_text_prob['Happiness']
             speech_text_neutral = speech_text_prob['Calmness']
             speech_text_anger = speech_text_prob['Anger']
@@ -98,8 +99,43 @@ def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {},
             entry['lyrics']['weighting'] = text_weighting
             entry['audio']['weighting'] = 1 - text_weighting
             entry['combined']['similarity'] = similarity_combined
-
             nearest_neighbour.append(entry)
+            continue
+    
+    if mode == 'all':
+        emotion_nearest_neighbour = sorted(nearest_neighbour, key=lambda x: last_entry(x, "combined"))
+        top_20 = emotion_nearest_neighbour[:20]
+        nearest_neighbour = []
+        for entry in top_20:
+            # extract & compare keywords
+            audio_similarity = entry['audio']['similarity']
+            text_similarity = entry['lyrics']['similarity']
+            speech_keywords = semantics.keyword_extraction(text)
+            lyrics_keywords = []
+            w2w_similarity = []
+            for l_kw in entry['keywords']['lyrics_keywords']:
+                single_keyword = (l_kw['keyword'], l_kw['significance'])
+                lyrics_keywords.append(single_keyword)
+            if lyrics_keywords == []:
+                semantics_similarity = 0
+            else:
+                semantics_similarity, w2w_similarity = semantics.keywords_relevance(speech_keywords, lyrics_keywords)
+            similarity_combined = audio_similarity*(1/3) + text_similarity*(1/3) + semantics_similarity*(1/3)
+            
+            speech_keywords_list = []
+            for s_kw in speech_keywords:
+                single_keyword = {'keyword': s_kw[0], 'significance': s_kw[1]}
+                speech_keywords_list.append(single_keyword)
+            entry['keywords']['speech_keywords'] = speech_keywords_list
+            entry['keywords']['w2w_similarity'] = w2w_similarity
+            entry['keywords']['similarity'] = semantics_similarity
+
+            entry['lyrics']['weighting'] = 0.333
+            entry['audio']['weighting'] = 0.333
+            entry['keywords']['weighting'] = 0.333
+            entry['all']['similarity'] = similarity_combined
+            nearest_neighbour.append(entry)
+            continue
 
     nearest_neighbour = sorted(nearest_neighbour, key=lambda x: last_entry(x, mode), reverse=True)
     if output_no == -1:
@@ -108,9 +144,9 @@ def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {},
         return nearest_neighbour[:output_no]
 
 
-# ################## EXAMPLE & SPECIFICATION #####################
-# # mode: "audio" or "combined"
-# mode = "combined"
+################## EXAMPLE & SPECIFICATION #####################
+# # mode: "audio" or "combined" or "all"
+# mode = "all"
 
 # # speech_audio_prob: dictionary of 4 emotion prob
 # speech_audio_prob = {'Happiness': 0.5,
@@ -124,11 +160,14 @@ def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {},
 #                      'Sadness': 0.1,
 #                      'Calmness': 0.1}
 
+# # text: original speech text
+# text = "I am a mastermind like my friends. we play dominoes at first night. Being the wisest women is our fates"
+
 # # text_weighting: weigting of text default = 0.5
-# text_weighting = 0.7
+# text_weighting = 0.5
 
 # # output_no=-1
 
-# neighbours = getSongList(mode, speech_audio_prob, speech_text_prob, text_weighting)
+# neighbours = getSongList(mode, speech_audio_prob, speech_text_prob, text_weighting, text)
 # with open('neighbour_list.json', 'w') as f:
 #     json.dump(neighbours, f)

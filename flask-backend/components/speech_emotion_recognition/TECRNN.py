@@ -48,12 +48,17 @@ def audio_speech_to_text(audio):
     # return a dictionary, indicating whether transcription is successful and its results
     return response
 
-def evaluateTextInSpeech(audio_path, model_path):
+def evaluateTextInSpeech(audio_path, model_path, audio_happiness, audio_anger, audio_sadness, audio_calmness):
     result = {"success": True,
                 "error": None,
                 "percentage": None,
                 "text": None}
-    
+
+    audio_probability = {"happiness": audio_happiness,
+                               "anger": audio_anger,
+                               "sadness": audio_sadness,
+                               "calmness": audio_calmness
+            }
     response = audio_speech_to_text(audio_path)
     if response['success'] == False:
         result['success'] = False
@@ -73,22 +78,22 @@ def evaluateTextInSpeech(audio_path, model_path):
 
 
 
-"""
-Example:
+
+# Example:
 # path to audio file ***MUST BE IN WAV FORMAT***
-audio_path = 'C:/Users/SW/Documents/TEC/demo.wav'
-# path to model (can't use .h5 here cuz will lose vocab)
-model_path = 'C:/Users/SW/Documents/TEC/TECRNN'
-audio_happiness = 0.6
-audio_anger = 0.2
-audio_sadness = 0.1
-audio_almness = 0.1
-mode = text
+# audio_path = 'C:/Users/SW/Documents/TEC/demo.wav'
+# # path to model (can't use .h5 here cuz will lose vocab)
+# model_path = 'C:/Users/SW/Documents/TEC/TECRNN_models/Embedding_64, Bi-directional LSTM w. sequence_64, Bi-directional LSTM_32, Dense_64, Dropout_0.5, Dense_softmax_4, lr=0.0001.h5'
+# audio_happiness = 0.6
+# audio_anger = 0.2
+# audio_sadness = 0.1
+# audio_almness = 0.1
+# mode = "text"
 
-print(evaluate(audio_path, audio_happiness, audio_anger, audio_sadness, audio_almness, model_path, mode, text_weighting)['text'])
-print(evaluate(audio_path, audio_happiness, audio_anger, audio_sadness, audio_almness, model_path, mode, text_weighting)['mode'])
-print(evaluate(audio_path, audio_happiness, audio_anger, audio_sadness, audio_almness, model_path, mode, text_weighting)['audio_probability'])
-print(evaluate(audio_path, audio_happiness, audio_anger, audio_sadness, audio_almness, model_path, mode, text_weighting)['text_probability'])
+# print(evaluate(audio_path, model_path, mode, audio_happiness, audio_anger, audio_sadness, audio_almness))
+# print(evaluate(audio_path, audio_happiness, audio_anger, audio_sadness, audio_almness, model_path, mode, text_weighting)['mode'])
+# print(evaluate(audio_path, audio_happiness, audio_anger, audio_sadness, audio_almness, model_path, mode, text_weighting)['audio_probability'])
+# print(evaluate(audio_path, audio_happiness, audio_anger, audio_sadness, audio_almness, model_path, mode, text_weighting)['text_probability'])
 
-"""
+
 

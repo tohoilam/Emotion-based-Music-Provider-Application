@@ -127,32 +127,32 @@ def predict():
   return SER_Predict(request, fileList, filenameList)
 
 
-@speech_emotion_recognition_blueprint.route(PATH_DIR_NAME + '/predict-by-text', methods=['POST'])
-@cross_origin()
-def predictByText():
-  # 1). Pack audio files
-  fileList = []
-  filenameList = []
+# @speech_emotion_recognition_blueprint.route(PATH_DIR_NAME + '/predict-by-text', methods=['POST'])
+# @cross_origin()
+# def predictByText():
+#   # 1). Pack audio files
+#   fileList = []
+#   filenameList = []
 
-  if (len(request.files) != 0):
-    for filename in request.files:
-      file = request.files[filename]
+#   if (len(request.files) != 0):
+#     for filename in request.files:
+#       file = request.files[filename]
 
-      audio = AudioSegment.from_file(file)
+#       audio = AudioSegment.from_file(file)
         
-      if (audio.frame_rate != 16000):
-        audio = audio.set_frame_rate(16000)
-      if (audio.channels != 1):
-        audio = audio.set_channels(1)
+#       if (audio.frame_rate != 16000):
+#         audio = audio.set_frame_rate(16000)
+#       if (audio.channels != 1):
+#         audio = audio.set_channels(1)
 
-      fileList.append(audio)
-      filenameList.append(filename)
-  else:
-    warnMsg = 'No audio data to predict.'
-    print('Warning: ' + warnMsg)
-    return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+#       fileList.append(audio)
+#       filenameList.append(filename)
+#   else:
+#     warnMsg = 'No audio data to predict.'
+#     print('Warning: ' + warnMsg)
+#     return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
 
-  return Text_Predict(request, fileList, filenameList)
+#   return Text_Predict(request, fileList, filenameList)
 
 
 def SER_Predict_Full(api_request, fileList, filenameList, fixed_model_choice=None):
@@ -287,16 +287,16 @@ def SER_Predict(api_request, fileList, filenameList, fixed_model_choice=None):
   
   return {'data': predicted_data_list, 'status': 'ok', 'errMsg': ''}
 
-def Text_Predict(api_request, fileList, filenameList):
+def Text_Predict(api_request, fileList, filenameList, percentage_dict):
   print('Text Emotion Recognition Predict')
 
-  modelDir = os.path.join(os.getcwd(), MODEL_PATH, 'TECRNN')
+  modelDir = os.path.join(os.getcwd(), MODEL_PATH, 'TECRNN.h5')
   
   textEmotionList = []
   for pos, audio_file in enumerate(fileList):
     filename = filenameList[pos]
 
-    result = evaluateTextInSpeech(audio_file, modelDir)
+    result = evaluateTextInSpeech(audio_file, modelDir, percentage_dict['Happiness'], percentage_dict['Anger'], percentage_dict['Sadness'], percentage_dict['Calmness'])
 
     if (result and result['success']):
       textEmotionList.append({

@@ -351,22 +351,24 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
                 <Grid item xs={6} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
                   <Typography variant="h2">Song Name: {musicInfoToDisplay['song_name']}</Typography>
                   <Typography variant="h3" color={colors.greenAccent[300]}>Artist: {musicInfoToDisplay['artist']}</Typography>
-                </Grid>
-                <Grid item xs={6}>
                   <iframe title={musicInfoToDisplay['spotify_id']} src={"https://open.spotify.com/embed/track/" + musicInfoToDisplay['spotify_id']} width="100%" height="80px" frameBorder="0"></iframe>
                 </Grid>
-                <Grid item xs={3} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
-                  <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
+                <Grid item xs={2} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+                  <Typography noWrap variant="h3" align="right" sx={{ p:1, mt: "26px" }}>
                     Your emotion:
                   </Typography>
+                  <Typography noWrap variant="h3" align="right" sx={{ p:1, mt: "26px" }}>
+                    Similarity:
+                  </Typography>
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs={4}>
                   <Paper 
                     variant="outlined" 
                     sx={{
                       backgroundColor: colors.emotion[speechInfo['audio']['emotion']],
                       p: 1,
-                      borderRadius: "6px"
+                      borderRadius: "6px",
+                      mt: 3
                     }}>
                       <Typography variant="h3" align="center">
                         {
@@ -377,15 +379,7 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
                         }
                       </Typography>
                   </Paper>
-                </Grid>
-
-                <Grid item xs={4} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
-                  <Typography noWrap variant="h3" align="center" sx={{ p:1 }}>
-                    Similarity:
-                  </Typography>
-                </Grid>
-                <Grid item xs={2}>
-                  <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
+                  <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px", mt: 3}}>
                     <Typography variant="h3" align="center">
                       {
                         toPercentageFormat(musicInfoToDisplay['audio']['similarity']).toString() + "%"
@@ -393,6 +387,19 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
                     </Typography>
                   </Paper>
                 </Grid>
+
+                {/* <Grid item xs={4} sx={{overflow: "hidden", textOverflow: "ellipsis"}}>
+
+                </Grid> */}
+                {/* <Grid item xs={2}>
+                  <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
+                    <Typography variant="h3" align="center">
+                      {
+                        toPercentageFormat(musicInfoToDisplay['audio']['similarity']).toString() + "%"
+                      }
+                    </Typography>
+                  </Paper>
+                </Grid> */}
 
               </Grid>
             </Grid>
