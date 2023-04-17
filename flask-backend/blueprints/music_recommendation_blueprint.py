@@ -56,9 +56,15 @@ def getSongs():
     errMsg = 'Mode of recommendation is not indicated'
     print('Failed: ' + errMsg)
     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+
+  if ('size' not in request.form):
+    errMsg = 'Size of recommendation is not indicated'
+    print('Faled: ' + errMsg)
+    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   
   mode = request.form['mode']
-    
+  size = int(request.form['size'])
+
 
   text_weighting = 0.5
 
@@ -70,7 +76,7 @@ def getSongs():
   if (mode == 'audio'):
     json_path = os.path.join('components', 'music_recommendation', 'songs_audio.json')
 
-    songList = getSongList(mode, json_path, audio_emotion_percentages, text_weighting=text_weighting, output_no=20)
+    songList = getSongList(mode, json_path, audio_emotion_percentages, text_weighting=text_weighting, output_no=size)
 
 
     returnData = {
@@ -91,7 +97,7 @@ def getSongs():
 
     json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
 
-    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, output_no=20)
+    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, output_no=size)
 
     returnData = {
       "speech_info": {
@@ -120,7 +126,7 @@ def getSongs():
 
     json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
 
-    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, text=text_speech_info["text"], output_no=20)
+    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, text=text_speech_info["text"], output_no=size)
 
     returnData = {
       "speech_info": {

@@ -1,3 +1,4 @@
+import io
 import os
 import copy
 import json
@@ -18,6 +19,7 @@ PATH_DIR_NAME = '/speech-emotion-recognition'
 
 MODEL_PATH = os.path.join('components', 'speech_emotion_recognition')
 MODEL_CONFIG_PATH = os.path.abspath(os.path.join('components', 'speech_emotion_recognition', 'models.json'))
+DATA_PATH = os.path.abspath(os.path.join('components', 'speech_emotion_recognition', 'audio_data'))
 
 @speech_emotion_recognition_blueprint.errorhandler(413)
 def too_large(e):
@@ -54,9 +56,37 @@ def predict():
 
   if (len(request.files) != 0):
     for filename in request.files:
-      file = request.files[filename]
+      audioFile = request.files[filename]
 
-      audio = AudioSegment.from_file(file)
+      audio_path = os.path.join(DATA_PATH, "audio.wav")
+
+      # audioFile.save(audio_path)
+      buffer = io.BytesIO()
+
+      if (audioFile.filename[-4:] != '.wav'):
+        # original_file = os.path.join(dirname, filename)
+        # wav_filename = os.path.join(dirname, filename[:-4] + ".wav")
+        if (audioFile.filename[-4:] == '.m4a'):
+          track = AudioSegment.from_file(audioFile,  format='m4a')
+          file_handle = track.export(buffer, format='wav')
+        elif (audioFile.filename[-4:] == '.mp3'):
+          track = AudioSegment.from_mp3(audioFile)
+          file_handle = track.export(buffer, format='wav')
+        elif (audioFile.filename[-4:] == '.ogg' or filename[-5:] == '.opus'):
+          track = AudioSegment.from_ogg(audioFile)
+          file_handle = track.export(buffer, format='wav')
+        elif (audioFile.filename[-3:] == '.au'):
+          track = AudioSegment.from_file(audioFile,  format='au')
+          file_handle = track.export(buffer, format='wav')
+        else:
+          track = AudioSegment.from_file(audioFile,  format='wav')
+          file_handle = track.export(buffer, format='wav')
+          # audioFile.save(buffer)
+
+      print(audioFile.filename)
+      # audio = AudioSegment.from_file(file)
+      audio = AudioSegment.from_wav(buffer)
+      # audio = AudioSegment.from_wav(audio_path)
         
       if (audio.frame_rate != 16000):
         audio = audio.set_frame_rate(16000)

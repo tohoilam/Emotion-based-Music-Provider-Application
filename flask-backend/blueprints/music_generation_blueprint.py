@@ -68,7 +68,13 @@ def generate():
     print('Failed: ' + errMsg)
     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   
+  # if ('size' not in request.form):
+  #   errMsg = 'Size of recommendation is not indicated'
+  #   print('Faled: ' + errMsg)
+  #   return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+  
   mode = request.form['mode']
+  # size = int(request.form['size'])
   
 
   speech_result = SER_Predict_Full(request, fileList, filenameList, fixed_model_choice=MODEL_CHOICE)
@@ -122,31 +128,59 @@ def generate():
   audio_list = []
   generated_music = []
   for i in range(3):
-    primer_path = os.path.join(PRIMERS_MIDI_PATHS, mode, "All", sorted_primers[i]['filename'])
+    primer_path = os.path.join(PRIMERS_MIDI_PATHS, "All", sorted_primers[i]['filename'])
 
-    attention_sequence = generateMusic(
-      MODEL_PATH,
-      "melody_rnn",
-      "attention_rnn",
-      primer_path=primer_path,
-      total_length_steps=70,
-      temperature=1
-    )
-    print("generated")
+    for retryCount in range(3):
+      if (mode == "polyphonic"):
+        attention_sequence = generateMusic(
+          MODEL_PATH,
+          "polyphony",
+          "polyphony",
+          primer_path=primer_path,
+          condition_on_primer=True,
+          inject_primer_during_generation=True,
+          total_length_steps=70,
+          temperature=1
+        )
+      else:
+        attention_sequence = generateMusic(
+          MODEL_PATH,
+          "melody_rnn",
+          "attention_rnn",
+          primer_path=primer_path,
+          total_length_steps=70,
+          temperature=1
+        )
+      print(f"Generated ({i}-{retryCount})")
 
-    attention_pretty_midi = mm.midi_io.note_sequence_to_pretty_midi(attention_sequence)
-    waveform = attention_pretty_midi.fluidsynth(fs=SAMPLING_RATE)
-    scaled = np.int16(waveform / np.max(np.abs(waveform)) * 32767)
-    # Create a BytesIO object to hold the binary data
-    wavBuffer = io.BytesIO()
-    write(wavBuffer, SAMPLING_RATE, scaled)
-    binary_data = wavBuffer.getvalue()
+
+      attention_pretty_midi = mm.midi_io.note_sequence_to_pretty_midi(attention_sequence)
+
+      # Adjust velocity
+      if (emotion != "Anger"):
+        for j in range(len(attention_pretty_midi.instruments[0].notes)):
+          if (emotion == "Calmness"):
+            attention_pretty_midi.instruments[0].notes[j].velocity = 20
+          elif (emotion == "Happiness"):
+            attention_pretty_midi.instruments[0].notes[j].velocity = 90
+          else:
+            attention_pretty_midi.instruments[0].notes[j].velocity = 80
+      
+      waveform = attention_pretty_midi.fluidsynth(fs=SAMPLING_RATE)
+      scaled = np.int16(waveform / np.max(np.abs(waveform)) * 32767)
+      # Create a BytesIO object to hold the binary data
+      wavBuffer = io.BytesIO()
+      write(wavBuffer, SAMPLING_RATE, scaled)
+      binary_data = wavBuffer.getvalue()
+      
+      generated_info = get_info2(MEC_MODEL_PATH, attention_pretty_midi, MEC_EMOTION_CLASS)
+      if (generated_info["emotion"] == emotion):
+        break
+
     audio_list.append(binary_data)
-    
-    generated_info = get_info2(MEC_MODEL_PATH, attention_pretty_midi, MEC_EMOTION_CLASS)
+
+
     generated_emotion_percentages = generated_info['emotion_percentages'][0]
-    # print(generated_info)
-    # print(audio_emotion_percentages)
 
     generated_info['similarity'] = min(audio_emotion_percentages['Happiness'], generated_emotion_percentages[0]) + min(audio_emotion_percentages['Anger'], generated_emotion_percentages[1]) + min(audio_emotion_percentages['Sadness'], generated_emotion_percentages[2]) + min(audio_emotion_percentages['Calmness'], generated_emotion_percentages[3])
 

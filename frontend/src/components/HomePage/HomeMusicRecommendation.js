@@ -23,7 +23,8 @@ export const HomeMusicRecommendation = ({
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
   const [recommendedMusic, setRecommendedMusic] = useState([]);
-  const [genre, setGenre] = useState("pop");
+  // const [genre, setGenre] = useState("pop");
+  const [numOfSongs, setNumOfSongs] = useState(20);
   const [selectedMode, setSelectedMode] = useState('audio');
 
   const [dropActive, setDropActive] = useState([]);
@@ -142,6 +143,7 @@ export const HomeMusicRecommendation = ({
     let formData = new FormData();
     formData.append(recordedAudio['className'], recordedAudio['blob'], recordedAudio['fileName']);
     formData.append('mode', selectedMode);
+    formData.append('size', numOfSongs);
 
     const response = await MRApi.getMusicRecommendation(formData);
     console.log(response);
@@ -155,8 +157,8 @@ export const HomeMusicRecommendation = ({
     setIsLoading(false);
   }
 
-  const changeGenre = (event) => {
-    setGenre(event.target.value);
+  const changeNumOfSongs = (event) => {
+    setNumOfSongs(event.target.value);
   };
 
   const changeMode = (event) => {
@@ -239,7 +241,7 @@ export const HomeMusicRecommendation = ({
 
 
             <Grid item xs={4} sx={{height: "70px"}}>
-              <Typography variant="h3" align="center" sx={{pt: "12px"}} >Mode</Typography>
+              <Typography variant="h3" align="left" sx={{pt: "12px", pl: 1}} >Mode</Typography>
             </Grid>
             <Grid item xs={8} sx={{height: "70px"}}>
               <FormControl fullWidth>
@@ -259,23 +261,34 @@ export const HomeMusicRecommendation = ({
               </FormControl>
             </Grid>
 
-            <Grid item xs={4} sx={{height: "70px"}}>
-              <Typography variant="h3" align="center" sx={{pt: "12px"}} >Genre</Typography>
+            <Grid item xs={7} sx={{height: "70px"}}>
+              <Typography variant="h3" align="left" sx={{pt: "12px", pl: 1}} >Num of Songs</Typography>
             </Grid>
-            <Grid item xs={8} sx={{height: "70px"}}>
+            <Grid item xs={5} sx={{height: "70px"}}>
               <FormControl fullWidth>
-                <InputLabel id="genre-selection">Genre</InputLabel>
+                <InputLabel id="num-songs-selection">Number of Songs</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  value={genre}
-                  label="Genre"
-                  onChange={changeGenre}
+                  value={numOfSongs}
+                  label="Number of Songs"
+                  onChange={changeNumOfSongs}
                   sx={{height: "50px"}}
                 >
-                  <MenuItem value={"all"}>ALL</MenuItem>
-                  <MenuItem value={"pop"}>Pop</MenuItem>
-                  <MenuItem value={"rnb"}>R&B</MenuItem>
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={15}>15</MenuItem>
+                  <MenuItem value={20}>20</MenuItem>
+                  <MenuItem value={25}>25</MenuItem>
+                  <MenuItem value={30}>30</MenuItem>
+                  <MenuItem value={35}>35</MenuItem>
+                  <MenuItem value={40}>40</MenuItem>
+                  <MenuItem value={45}>45</MenuItem>
+                  <MenuItem value={50}>50</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -345,9 +358,9 @@ export const HomeMusicRecommendation = ({
                         {
                           (recommendMode === 'audio')
                             ? toPercentageFormat(music['audio']['similarity']).toString() + "%"
-                            : (recommendMode === 'combined' || recommendMode === 'all')
+                            : (recommendMode === 'combined')
                               ? toPercentageFormat(music['combined']['similarity']).toString() + "%"
-                              : "???"
+                              : toPercentageFormat(music['all']['similarity']).toString() + "%"
                         }
                       </Typography>
                       <Button

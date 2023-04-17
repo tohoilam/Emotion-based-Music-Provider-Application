@@ -19,6 +19,8 @@ def generateMusic(bundle_path: str,
                   sequence_generator_option: str,
                   generator_id: str = None,
                   primer_path: str = None,
+                  condition_on_primer: bool = False,
+                  inject_primer_during_generation: bool = False,
                   qpm: float = DEFAULT_QUARTERS_PER_MINUTE,
                   total_length_steps: int = 64,
                   temperature: float = 1.0,
@@ -34,7 +36,7 @@ def generateMusic(bundle_path: str,
     if (not os.path.isabs(primer_path)):
       primer_path = os.path.abspath(primer_path)
 
-  sequence_generator_available_option = ["melody_rnn"]
+  sequence_generator_available_option = ["melody_rnn", "polyphony"]
   if (sequence_generator_option not in sequence_generator_available_option):
     print(f"Please choose an available sequence generator in {str(sequence_generator_available_option)}")
     return None
@@ -106,6 +108,9 @@ def generateMusic(bundle_path: str,
   generator_options.args['beam_size'].int_value = beam_size
   generator_options.args['branch_factor'].int_value = branch_factor
   generator_options.args['steps_per_iteration'].int_value = steps_per_iteration
+  if (sequence_generator_option == "polyphony"):
+    generator_options.args['condition_on_primer'].bool_value = (condition_on_primer)
+    generator_options.args['no_inject_primer_during_generation'].bool_value = (not inject_primer_during_generation)
   generator_options.generate_sections.add(
     start_time = generation_start_time,
     end_time = generation_end_time
