@@ -107,7 +107,7 @@ const HeatmapChart = ({ data, height, title, subtitle }) => {
   const Heatmap = () => {
     return (
       <ResponsiveHeatMap
-          data={mockData}
+          data={data}
           theme={chartsTheme}
           margin={{ top: 80, right: 20, bottom: 50, left: 90 }}
           valueFormat=">-.1%"
@@ -137,8 +137,8 @@ const HeatmapChart = ({ data, height, title, subtitle }) => {
           }}
           colors={{
               type: 'diverging',
-              scheme: 'red_yellow_blue',
-              minValue: 0,
+              scheme: 'red_blue',
+              minValue: -1,
               maxValue: 1,
               divergeAt: 0.5
           }}
@@ -176,7 +176,16 @@ const HeatmapChart = ({ data, height, title, subtitle }) => {
 
 
   return (
-    <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px"}} m="20px">
+    <Paper
+      variant="outlined"
+      sx={{
+        backgroundColor: colors.greenAccent[800],
+        background: `linear-gradient(45deg, ${colors.primary[700]}, ${colors.purplePinkAccent[800]})`,
+        p: 2,
+        borderRadius: "6px"
+      }}
+      m="20px"
+    >
       <Header title={title} subtitle={subtitle}></Header>
       <Box height={height}>
         <Heatmap />

@@ -56,9 +56,15 @@ def getSongs():
     errMsg = 'Mode of recommendation is not indicated'
     print('Failed: ' + errMsg)
     return {'data': [], 'status': 'failed', 'errMsg': errMsg}
+
+  if ('size' not in request.form):
+    errMsg = 'Size of recommendation is not indicated'
+    print('Faled: ' + errMsg)
+    return {'data': [], 'status': 'failed', 'errMsg': errMsg}
   
   mode = request.form['mode']
-    
+  size = int(request.form['size'])
+
 
   text_weighting = 0.5
 
@@ -70,7 +76,7 @@ def getSongs():
   if (mode == 'audio'):
     json_path = os.path.join('components', 'music_recommendation', 'songs_audio.json')
 
-    songList = getSongList(mode, json_path, audio_emotion_percentages, text_weighting=text_weighting, output_no=20)
+    songList = getSongList(mode, json_path, audio_emotion_percentages, text_weighting=text_weighting, output_no=size)
 
 
     returnData = {
@@ -79,10 +85,10 @@ def getSongs():
       },
       "song_list": songList,
     }
-  else:
+  elif (mode == 'combined'):
     audio_weighting = 0.5
 
-    text_result = Text_Predict(request, fileList, filenameList)
+    text_result = Text_Predict(request, fileList, filenameList, audio_emotion_percentages)
     text_speech_info = text_result['data'][0]
     text_emotion_percentages = text_speech_info["percentage"]
 
@@ -91,7 +97,36 @@ def getSongs():
 
     json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
 
-    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, output_no=20)
+    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, output_no=size)
+
+    returnData = {
+      "speech_info": {
+        "audio": audio_speech_info,
+        "text": {
+          "text": text_speech_info["text"],
+          "percentage": text_emotion_percentages,
+          "emotion": max(text_emotion_percentages, key=text_emotion_percentages.get)
+        },
+        "combined": {
+          "percentage": combined_percentages,
+          "emotion": combined_emotion
+        }
+      },
+      "song_list": songList,
+    }
+  else :
+    audio_weighting = 0.5
+
+    text_result = Text_Predict(request, fileList, filenameList, audio_emotion_percentages)
+    text_speech_info = text_result['data'][0]
+    text_emotion_percentages = text_speech_info["percentage"]
+
+    combined_percentages = combineEmotionPercentages(audio_emotion_percentages, text_emotion_percentages, audio_weighting)
+    combined_emotion = max(combined_percentages, key=combined_percentages.get)
+
+    json_path = os.path.join('components', 'music_recommendation', 'songs_lyrics.json')
+
+    songList = getSongList(mode, json_path, audio_emotion_percentages, speech_text_prob=text_emotion_percentages, text_weighting=text_weighting, text=text_speech_info["text"], output_no=size)
 
     returnData = {
       "speech_info": {
@@ -109,6 +144,7 @@ def getSongs():
       "song_list": songList,
     }
   return {'data': returnData, 'status': 'ok', 'errMsg': ''}
+
 
 @music_recommendation_blueprint.route(PATH_DIR_NAME + '/dummy', methods=['POST'])
 @cross_origin()

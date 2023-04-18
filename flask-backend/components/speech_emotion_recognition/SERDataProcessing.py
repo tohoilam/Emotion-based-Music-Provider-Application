@@ -41,14 +41,14 @@ class SERDataProcessing:
     for i, audio in enumerate(audioBytesList):
       # audio = AudioSegment.from_file(audioBytes)
         
-      # if (audio.frame_rate != 16000):
-      #   audio = audio.set_frame_rate(16000)
-      # if (audio.channels != 1):
-      #   audio = audio.set_channels(1)
+      if (audio.frame_rate != 16000):
+        audio = audio.set_frame_rate(16000)
+      if (audio.channels != 1):
+        audio = audio.set_channels(1)
         
       sr = audio.frame_rate
       
-      audio = effects.normalize(audio, headroom = 5.0) # TODO: Try other head room
+      audio = effects.normalize(audio, headroom = 1.0) # TODO: Try other head room
       x = np.array(audio.get_array_of_samples(), dtype = 'float32')
       
       x_list.append(x)

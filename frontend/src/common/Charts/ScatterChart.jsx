@@ -1093,6 +1093,7 @@ const ScatterChart = ({ data, height, title, subtitle }) => {
                   effects: [
                       {
                           on: 'hover',
+
                           style: {
                               itemOpacity: 1
                           }
@@ -1106,7 +1107,19 @@ const ScatterChart = ({ data, height, title, subtitle }) => {
 
 
   return (
-    <Paper variant="outlined" sx={{backgroundColor: colors.greenAccent[800], p: 2, borderRadius: "6px"}} m="20px">
+    <Paper
+      variant="outlined"
+      sx={{
+        backgroundColor: colors.greenAccent[800],
+        p: 2,
+        borderRadius: "6px",
+        // background: `linear-gradient(315deg, #780206, #061161)`,
+        background: `linear-gradient(45deg, ${colors.primary[700]}, ${colors.purplePinkAccent[800]})`
+        // background: `linear-gradient(45deg, ${colors.redAccent[600]}, ${colors.blueAccent[900]})`
+        // background: `linear-gradient(217deg, ${colors.primary[700]}CC, ${colors.primary[700]} 70.71%), linear-gradient(127deg, ${colors.purplePinkAccent[800]}CC, ${colors.purplePinkAccent[800]} 70.71%), linear-gradient(336deg, ${colors.pinkAccent[800]}CC, ${colors.pinkAccent[800]} 70.71%)`
+      }}
+      m="20px"
+    >
       <Header title={title} subtitle={subtitle}></Header>
       <Box height={height}>
         <Scatter />

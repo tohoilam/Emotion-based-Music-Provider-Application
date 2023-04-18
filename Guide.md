@@ -25,6 +25,15 @@ heroku container:release web --app ebmp-api
 ```
 heroku container:login
 
+cd flask-backend
+
+heroku container:push web --app ebmp-api
+
+heroku container:release web --app ebmp-api
+
+
+cd frontend
+
 heroku container:push web --app emotion-based-music-provider
 
 heroku container:release web --app emotion-based-music-provider

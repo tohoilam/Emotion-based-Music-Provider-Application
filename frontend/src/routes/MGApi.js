@@ -25,21 +25,42 @@ const getMusicGeneration = async (formData) => {
 
 			const audioData1 = zip.file('generated0.wav').async('arraybuffer')
 			const audioData2 = zip.file('generated1.wav').async('arraybuffer')
+			const audioData3 = zip.file('generated2.wav').async('arraybuffer')
 			const jsonData = zip.file('info.json').async('string');
 			
-			return Promise.all([audioData1, audioData2, jsonData]);
+			return Promise.all([audioData1, audioData2, audioData3, jsonData]);
 		})
-		.then(([audioData1, audioData2, jsonData]) => {
+		.then(([audioData1, audioData2, audioData3, jsonData]) => {
 			const blobUrlList = [
 				URL.createObjectURL(new Blob([audioData1], { type: 'audio/wav' })),
-				URL.createObjectURL(new Blob([audioData2], { type: 'audio/wav' }))
+				URL.createObjectURL(new Blob([audioData2], { type: 'audio/wav' })),
+				URL.createObjectURL(new Blob([audioData3], { type: 'audio/wav' }))
 			]
 
 			const infoData = JSON.parse(jsonData);
 				
 			return {
-				'blobUrlList': blobUrlList,
-				'infoData': infoData
+				'generatedMusic': [
+					{
+						"blobUrl": blobUrlList[0],
+						"primers": infoData['generated_music'][0]['primers_info'],
+						"generated": infoData['generated_music'][0]['generated_info'],
+						"name": "Generated Music 1"
+					},
+					{
+						"blobUrl": blobUrlList[1],
+						"primers": infoData['generated_music'][1]['primers_info'],
+						"generated": infoData['generated_music'][1]['generated_info'],
+						"name": "Generated Music 2"
+					},
+					{
+						"blobUrl": blobUrlList[2],
+						"primers": infoData['generated_music'][2]['primers_info'],
+						"generated": infoData['generated_music'][2]['generated_info'],
+						"name": "Generated Music 3"
+					},
+				],
+				'speech_info': infoData['speech']
 			};
 		})
 		.catch(error => {

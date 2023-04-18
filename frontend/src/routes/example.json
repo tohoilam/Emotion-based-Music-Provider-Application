@@ -1,0 +1,105 @@
+{
+  "data": {
+    "song_list": [
+      {
+        "artist": "Amy Winehouse",
+        "audio": {
+          "arousal": 0.06638029962778,
+          "distance": 0.6775657286462582,
+          "emotion": "Anger",
+          "similarity": 0.8067406988606278,
+          "valence": -0.008858461864292,
+          "weighting": 0.5
+        },
+        "audio_lyrics_similarity": 0.05692635305846716,
+        "combined": {
+          "arousal": 0.25765939522534587,
+          "distance": 0.4284527172793332,
+          "emotion": "Happiness",
+          "similarity": 0.8684468761325658,
+          "valence": 0.2426383471271646
+        },
+        "genius_id": "62993",
+        "genre": [
+          "british soul",
+          "neo soul"
+        ],
+        "lyrics": {
+          "arousal": 0.9642572812736034,
+          "distance": 0.8588822889357941,
+          "emotion": "Happiness",
+          "percentage": {
+            "Anger": 0.009227296337485313,
+            "Calmness": 0.01680458088715871,
+            "Happiness": 0.9729013442993164,
+            "Sadness": 0.0010667817065647494
+          },
+          "percentage_per_section": {
+            "Anger": [
+              0.0022276323288679123,
+              0.02124951221048832,
+              0.0042047444730997086
+            ],
+            "Calmness": [
+              0.004176042042672634,
+              0.03642141446471214,
+              0.009816286154091358
+            ],
+            "Happiness": [
+              0.9934613704681396,
+              0.9396624565124512,
+              0.9855802059173584
+            ],
+            "Sadness": [
+              0.00013494188897311687,
+              0.002666599815711379,
+              0.0003988034150097519
+            ]
+          },
+          "similarity": 0.7670707302867343,
+          "valence": 0.9794118503729503,
+          "weighting": 0.5
+        },
+        "song_name": "Love Is A Losing Game",
+        "spotify_id": "3uliGwmB52ZA7brgpZMzyH"
+      }
+    ],
+    "speech_info": {
+      "audio": {
+        "count": 2,
+        "emotion": "Happiness",
+        "name": "0",
+        "percentage": {
+          "Anger": 0.3869496285915375,
+          "Calmness": 0.13954673474654555,
+          "Happiness": 0.44368746131658554,
+          "Sadness": 0.029816218884661794
+        },
+        "section": "All"
+      },
+      "combined": {
+        "emotion": "Happiness",
+        "percentage": {
+          "Anger": 0.3595328629016876,
+          "Calmness": 0.13937963428907096,
+          "Happiness": 0.4138137809932232,
+          "Sadness": 0.0872737435856834
+        }
+      },
+      "text": {
+        "emotion": "Happiness",
+        "percentage": {
+          "Anger": 0.33211609721183777,
+          "Calmness": 0.13921253383159637,
+          "Happiness": 0.38394010066986084,
+          "Sadness": 0.14473126828670502
+        },
+        "text": "look out I've tried everything it's writing different features turning the hyperparameters in the mall and stuff what else I can do it just won't go up"
+      }
+    }
+  },
+  "errMsg": "",
+  "status": "ok"
+}
+
+

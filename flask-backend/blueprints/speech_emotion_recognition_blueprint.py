@@ -1,3 +1,4 @@
+import io
 import os
 import copy
 import json
@@ -18,6 +19,7 @@ PATH_DIR_NAME = '/speech-emotion-recognition'
 
 MODEL_PATH = os.path.join('components', 'speech_emotion_recognition')
 MODEL_CONFIG_PATH = os.path.abspath(os.path.join('components', 'speech_emotion_recognition', 'models.json'))
+DATA_PATH = os.path.abspath(os.path.join('components', 'speech_emotion_recognition', 'audio_data'))
 
 @speech_emotion_recognition_blueprint.errorhandler(413)
 def too_large(e):
@@ -54,9 +56,37 @@ def predict():
 
   if (len(request.files) != 0):
     for filename in request.files:
-      file = request.files[filename]
+      audioFile = request.files[filename]
 
-      audio = AudioSegment.from_file(file)
+      audio_path = os.path.join(DATA_PATH, "audio.wav")
+
+      # audioFile.save(audio_path)
+      buffer = io.BytesIO()
+
+      if (audioFile.filename[-4:] != '.wav'):
+        # original_file = os.path.join(dirname, filename)
+        # wav_filename = os.path.join(dirname, filename[:-4] + ".wav")
+        if (audioFile.filename[-4:] == '.m4a'):
+          track = AudioSegment.from_file(audioFile,  format='m4a')
+          file_handle = track.export(buffer, format='wav')
+        elif (audioFile.filename[-4:] == '.mp3'):
+          track = AudioSegment.from_mp3(audioFile)
+          file_handle = track.export(buffer, format='wav')
+        elif (audioFile.filename[-4:] == '.ogg' or filename[-5:] == '.opus'):
+          track = AudioSegment.from_ogg(audioFile)
+          file_handle = track.export(buffer, format='wav')
+        elif (audioFile.filename[-3:] == '.au'):
+          track = AudioSegment.from_file(audioFile,  format='au')
+          file_handle = track.export(buffer, format='wav')
+        else:
+          track = AudioSegment.from_file(audioFile,  format='wav')
+          file_handle = track.export(buffer, format='wav')
+          # audioFile.save(buffer)
+
+      print(audioFile.filename)
+      # audio = AudioSegment.from_file(file)
+      audio = AudioSegment.from_wav(buffer)
+      # audio = AudioSegment.from_wav(audio_path)
         
       if (audio.frame_rate != 16000):
         audio = audio.set_frame_rate(16000)
@@ -127,32 +157,32 @@ def predict():
   return SER_Predict(request, fileList, filenameList)
 
 
-@speech_emotion_recognition_blueprint.route(PATH_DIR_NAME + '/predict-by-text', methods=['POST'])
-@cross_origin()
-def predictByText():
-  # 1). Pack audio files
-  fileList = []
-  filenameList = []
+# @speech_emotion_recognition_blueprint.route(PATH_DIR_NAME + '/predict-by-text', methods=['POST'])
+# @cross_origin()
+# def predictByText():
+#   # 1). Pack audio files
+#   fileList = []
+#   filenameList = []
 
-  if (len(request.files) != 0):
-    for filename in request.files:
-      file = request.files[filename]
+#   if (len(request.files) != 0):
+#     for filename in request.files:
+#       file = request.files[filename]
 
-      audio = AudioSegment.from_file(file)
+#       audio = AudioSegment.from_file(file)
         
-      if (audio.frame_rate != 16000):
-        audio = audio.set_frame_rate(16000)
-      if (audio.channels != 1):
-        audio = audio.set_channels(1)
+#       if (audio.frame_rate != 16000):
+#         audio = audio.set_frame_rate(16000)
+#       if (audio.channels != 1):
+#         audio = audio.set_channels(1)
 
-      fileList.append(audio)
-      filenameList.append(filename)
-  else:
-    warnMsg = 'No audio data to predict.'
-    print('Warning: ' + warnMsg)
-    return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
+#       fileList.append(audio)
+#       filenameList.append(filename)
+#   else:
+#     warnMsg = 'No audio data to predict.'
+#     print('Warning: ' + warnMsg)
+#     return {'data': [], 'status': 'warning', 'errMsg': warnMsg}
 
-  return Text_Predict(request, fileList, filenameList)
+#   return Text_Predict(request, fileList, filenameList)
 
 
 def SER_Predict_Full(api_request, fileList, filenameList, fixed_model_choice=None):
@@ -287,16 +317,16 @@ def SER_Predict(api_request, fileList, filenameList, fixed_model_choice=None):
   
   return {'data': predicted_data_list, 'status': 'ok', 'errMsg': ''}
 
-def Text_Predict(api_request, fileList, filenameList):
+def Text_Predict(api_request, fileList, filenameList, percentage_dict):
   print('Text Emotion Recognition Predict')
 
-  modelDir = os.path.join(os.getcwd(), MODEL_PATH, 'TECRNN')
+  modelDir = os.path.join(os.getcwd(), MODEL_PATH, 'TECRNN.h5')
   
   textEmotionList = []
   for pos, audio_file in enumerate(fileList):
     filename = filenameList[pos]
 
-    result = evaluateTextInSpeech(audio_file, modelDir)
+    result = evaluateTextInSpeech(audio_file, modelDir, percentage_dict['Happiness'], percentage_dict['Anger'], percentage_dict['Sadness'], percentage_dict['Calmness'])
 
     if (result and result['success']):
       textEmotionList.append({
