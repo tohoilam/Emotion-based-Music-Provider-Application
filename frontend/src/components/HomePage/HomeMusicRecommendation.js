@@ -17,7 +17,8 @@ export const HomeMusicRecommendation = ({
     recommendMode,
     setRecommendMode,
     setAudioScatterData,
-    infoRef
+    infoRef,
+    setLoadTime
   }) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
@@ -71,6 +72,9 @@ export const HomeMusicRecommendation = ({
 
         setRecordedAudio(audioObject);
       }
+
+      setRecommendedMusic([]);
+      setSpeechInfo(null);
 
       setIsLoading(false);
     }
@@ -163,6 +167,17 @@ export const HomeMusicRecommendation = ({
 
   const changeMode = (event) => {
     setSelectedMode(event.target.value);
+    if (event.target.value == "audio") {
+      setLoadTime("15");
+    }
+    else if (event.target.value == "combined") {
+      setLoadTime("30")
+    }
+    else {
+      setLoadTime("60");
+    }
+
+
   };
 
   useEffect(() => {

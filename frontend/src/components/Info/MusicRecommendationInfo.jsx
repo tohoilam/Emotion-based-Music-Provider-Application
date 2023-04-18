@@ -60,7 +60,7 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
   }
 
   const updateSpeechEmotionDonutData = () => {
-    if (speechInfo){
+    if (speechInfo && 'audio' in speechInfo){
       const percentage = speechInfo['audio']['percentage'];
       const donutData = packEmotionDonutData(
                             toPercentageFormat(percentage['Anger']),
@@ -291,7 +291,7 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
         </Typography>
       </Grid>
       {
-        (recommendMode !== 'audio' && musicInfoToDisplay && speechInfo)
+        (recommendMode !== 'audio' && musicInfoToDisplay && speechInfo && 'audio' in speechInfo)
           ? <Grid item xs={8}>
               <Typography variant="h2">Song Name: {musicInfoToDisplay['song_name']}</Typography>
               <Typography variant="h3" color={colors.greenAccent[300]}>Artist: {musicInfoToDisplay['artist']}</Typography>
@@ -337,9 +337,11 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
                   <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px"}}>
                     <Typography variant="h3" align="center">
                       {
-                        (recommendMode === "combined")
-                          ? toPercentageFormat(musicInfoToDisplay['combined']['similarity']).toString() + "%"
-                          : toPercentageFormat(musicInfoToDisplay['all']['similarity']).toString() + "%"
+                        ('combined' in musicInfoToDisplay || 'all' in musicInfoToDisplay)
+                          ? (recommendMode === "combined")
+                            ? toPercentageFormat(musicInfoToDisplay['combined']['similarity']).toString() + "%"
+                            : toPercentageFormat(musicInfoToDisplay['all']['similarity']).toString() + "%"
+                          : ""
                       }
                     </Typography>
                   </Paper>
@@ -423,23 +425,28 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  <Paper 
-                    variant="outlined" 
-                    sx={{
-                      backgroundColor: colors.emotion[speechInfo['audio']['emotion']],
-                      p: 1,
-                      borderRadius: "6px",
-                      mt: 3
-                    }}>
-                      <Typography variant="h3" align="center">
-                        {
-                          speechInfo['audio']['emotion']
-                            + " ("
-                            + toPercentageFormat(speechInfo['audio']['percentage'][speechInfo['audio']['emotion']]).toString()
-                            + "%)"
-                        }
-                      </Typography>
-                  </Paper>
+                  {
+                    (speechInfo && 'audio' in speechInfo)
+                    ? <Paper 
+                        variant="outlined" 
+                        sx={{
+                          backgroundColor: colors.emotion[speechInfo['audio']['emotion']],
+                          p: 1,
+                          borderRadius: "6px",
+                          mt: 3
+                        }}>
+                          <Typography variant="h3" align="center">
+                            {
+                              speechInfo['audio']['emotion']
+                                + " ("
+                                + toPercentageFormat(speechInfo['audio']['percentage'][speechInfo['audio']['emotion']]).toString()
+                                + "%)"
+                            }
+                          </Typography>
+                      </Paper>
+                    : ""
+                  }
+                  
                   <Paper variant="outlined" sx={{backgroundColor: colors.redAccent[700], p: 1, borderRadius: "6px", mt: 3}}>
                     <Typography variant="h3" align="center">
                       {

@@ -30,6 +30,7 @@ export const HomePage = () => {
   const [recommendMode, setRecommendMode] = useState('audio');
   const [generateMode, setGenerateMode] = useState('monophonic');
   const [tab, setTab] = React.useState('1');
+  const [loadTime, setLoadTime] = React.useState('15');
 
   const infoRef = useRef(null);
 
@@ -43,6 +44,10 @@ export const HomePage = () => {
 
   const handleChange = (event, newValue) => {
     setTab(newValue);
+    // console.log(newValue);
+
+    setExpandedInfo(false);
+    setSpeechInfo(null);
   };
 
   useEffect(() => {
@@ -94,9 +99,11 @@ export const HomePage = () => {
               <CircularProgress size={50} thickness={3} sx={{mt: "45vh"}}></CircularProgress>
               <Typography variant="h4" color={colors.primary[500]}>analyzing...</Typography>
               {
-                (recommendMode !== "audio")
-                  ? <Typography variant="text" color={colors.primary[600]}>(approx. 1 minute)</Typography>
-                  : ""
+                (tab === "1")
+                  ? (loadTime == "60")
+                      ? <Typography variant="text" color={colors.primary[600]}>(approx. 1 minute)</Typography>
+                      : <Typography variant="text" color={colors.primary[600]}>(approx. {loadTime} seconds)</Typography>
+                  : <Typography variant="text" color={colors.primary[600]}>(approx. 1 minute)</Typography>
               }
             </Box>
           : ""
@@ -153,6 +160,7 @@ export const HomePage = () => {
                   setRecommendMode={setRecommendMode}
                   setAudioScatterData={setAudioScatterData}
                   infoRef={infoRef}
+                  setLoadTime={setLoadTime}
               ></HomeMusicRecommendation>
               <Paper 
                 sx={{
@@ -209,6 +217,7 @@ export const HomePage = () => {
                     generateMode={generateMode}
                     setGenerateMode={setGenerateMode}
                     infoRef={infoRef}
+                    setLoadTime={setLoadTime}
                 ></HomeMusicGeneration>
                 <Paper 
                   sx={{
@@ -232,7 +241,7 @@ export const HomePage = () => {
                     <AccordionDetails>
                       {/* <Typography> */}
                         {
-                          (musicInfoToDisplay)
+                          (tab === "1")
                           ? <MusicRecommendationInfo
                                 speechInfo={speechInfo}
                                 musicInfoToDisplay={musicInfoToDisplay}

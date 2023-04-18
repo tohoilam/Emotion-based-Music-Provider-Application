@@ -52,7 +52,7 @@ export const MusicGenerationInfo = ({speechInfo, generatedMusicInfoToDisplay}) =
   }
 
   const updateSpeechEmotionDonutData = () => {
-    if (speechInfo){
+    if (speechInfo && 'percentage' in speechInfo){
       const percentage = speechInfo['percentage'];
       const donutData = packEmotionDonutData(
                             toPercentageFormat(percentage['Anger']),

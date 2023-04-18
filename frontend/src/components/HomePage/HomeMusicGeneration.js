@@ -16,15 +16,14 @@ export const HomeMusicGeneration = ({
     speechInfo,
     generateMode,
     setGenerateMode,
-    infoRef
+    infoRef,
+    setLoadTime
   }) => {
 
   const [recordedAudio, setRecordedAudio] = useState(null);
   const [withText, setWithText] = useState(true);
-  const [recommendedMusic, setRecommendedMusic] = useState([]);
-  const [numOfSongs, setNumOfSongs] = useState(5);
   const [selectedMode, setSelectedMode] = useState('monophonic');
-  const [generatedMusic, setGeneratedMusic] = useState('')
+  const [generatedMusic, setGeneratedMusic] = useState([])
 
   const [dropActive, setDropActive] = useState([]);
 	const audioFileInputRef= useRef(null);
@@ -71,6 +70,9 @@ export const HomeMusicGeneration = ({
         setRecordedAudio(audioObject);
       }
 
+      setGeneratedMusic([]);
+      setSpeechInfo(null);
+
       setIsLoading(false);
     }
 
@@ -107,7 +109,6 @@ export const HomeMusicGeneration = ({
     let formData = new FormData();
     formData.append(recordedAudio['className'], recordedAudio['blob'], recordedAudio['fileName']);
     formData.append('mode', selectedMode);
-    formData.append('size', numOfSongs);
 
     const response = await MGApi.getMusicGeneration(formData);
     console.log(response);
@@ -126,16 +127,12 @@ export const HomeMusicGeneration = ({
     setSelectedMode(event.target.value);
   };
 
-  const changeNumOfSongs = (event) => {
-    setNumOfSongs(event.target.value);
-  };
-
 
   const EmotionItem = () => {
     let emotionText = "";
     let percentage = 0;
 
-    if (speechInfo) {
+    if (speechInfo && 'emotion' in speechInfo && 'percentage' in speechInfo) {
       emotionText = speechInfo['emotion'];
       percentage = speechInfo['percentage'][emotionText];
     }
@@ -209,29 +206,6 @@ export const HomeMusicGeneration = ({
                 >
                   <MenuItem value={'monophonic'}>Monophonic</MenuItem>
                   <MenuItem value={'polyphonic'}>Polyphonic</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={7} sx={{height: "70px"}}>
-              <Typography variant="h3" align="left" sx={{pt: "12px", pl: 1}} >Num of Songs</Typography>
-            </Grid>
-            <Grid item xs={5} sx={{height: "70px"}}>
-              <FormControl fullWidth>
-                <InputLabel id="num-songs-selection">Number of Songs</InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  value={numOfSongs}
-                  label="Number of Songs"
-                  onChange={changeNumOfSongs}
-                  sx={{height: "50px"}}
-                >
-                  <MenuItem value={1}>1</MenuItem>
-                  <MenuItem value={2}>2</MenuItem>
-                  <MenuItem value={3}>3</MenuItem>
-                  <MenuItem value={4}>4</MenuItem>
-                  <MenuItem value={5}>5</MenuItem>
                 </Select>
               </FormControl>
             </Grid>
