@@ -59,8 +59,8 @@ def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {},
     # Make song list
     nearest_neighbour = []
     for i in song_data:
-        v_audio = i['all_valence'][0]
-        a_audio = i['all_arousal'][0]
+        v_audio = i['audio']['valence']
+        a_audio = i['audio']['arousal']
         distance_audio = math.sqrt((speech_audio_VA[0] - v_audio) ** 2 + (speech_audio_VA[1] - a_audio) ** 2)
         entry = i
         entry['audio']['emotion'] = emotion_label(v_audio, a_audio)
@@ -69,8 +69,8 @@ def getSongList(mode, json_path, speech_audio_prob, speech_text_prob: dict = {},
         entry['audio']['similarity'] = audio_similarity
         text_similarity=0
 
-        entry['audio']['valence'] = entry['all_valence'][0]
-        entry['audio']['arousal'] = entry['all_arousal'][0]
+        entry['audio']['valence'] = entry['audio']['valence']
+        entry['audio']['arousal'] = entry['audio']['arousal']
 
         # audio mode: only use audio information
         if mode == 'audio':

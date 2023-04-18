@@ -73,8 +73,8 @@ export const HomeMusicRecommendation = ({
         setRecordedAudio(audioObject);
       }
 
-      setRecommendedMusic([]);
-      setSpeechInfo(null);
+      // setRecommendedMusic([]);
+      // setSpeechInfo(null);
 
       setIsLoading(false);
     }

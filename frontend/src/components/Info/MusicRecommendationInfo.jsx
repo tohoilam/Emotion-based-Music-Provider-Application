@@ -256,12 +256,6 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
       updateSpeechTextEmotionDonutData();
       updateSpeechText();
     }
-
-    if (recommendMode === 'all') {
-      updateSpeechKeywords();
-      updateLyricsKeywords();
-      udpateKeywordsSimilarity();
-    }
   }, [speechInfo]);
 
   useEffect(() => {
@@ -269,6 +263,12 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
       updateLyricsEmotionDonutData();
       updateAndGetLyrics();
       updateOverallRadarData();
+    }
+
+    if (recommendMode === 'all') {
+      updateSpeechKeywords();
+      updateLyricsKeywords();
+      udpateKeywordsSimilarity();
     }
     
   }, [musicInfoToDisplay]);
@@ -318,12 +318,12 @@ export const MusicRecommendationInfo = ({speechInfo, musicInfoToDisplay, recomme
                       borderRadius: "6px"
                     }}>
                       <Typography variant="h3" align="center">
-                        {
-                          speechInfo['audio']['emotion']
-                            + " ("
-                            + toPercentageFormat(speechInfo['audio']['percentage'][speechInfo['audio']['emotion']]).toString()
-                            + "%)"
-                        }
+                      {
+                        speechInfo['combined']['emotion']
+                          + " ("
+                          + toPercentageFormat(speechInfo['combined']['percentage'][speechInfo['combined']['emotion']]).toString()
+                          + "%)"
+                      }
                       </Typography>
                   </Paper>
                 </Grid>

@@ -70,8 +70,8 @@ export const HomeMusicGeneration = ({
         setRecordedAudio(audioObject);
       }
 
-      setGeneratedMusic([]);
-      setSpeechInfo(null);
+      // setGeneratedMusic([]);
+      // setSpeechInfo(null);
 
       setIsLoading(false);
     }
