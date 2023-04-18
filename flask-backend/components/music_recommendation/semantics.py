@@ -9,9 +9,12 @@ def keyword_extraction(text):
     kw_model = KeyBERT()
     # KeyphraseCountVectorizer parameter: pos_pattern='<N.*>'
     keyphrasevectorizer = KeyphraseCountVectorizer()
-    keywords_KPCV = kw_model.extract_keywords(text,
-                                            vectorizer=keyphrasevectorizer, # type: ignore
-                                            use_mmr=True)
+    try:
+        keywords_KPCV = kw_model.extract_keywords(text,
+                                                vectorizer=keyphrasevectorizer, # type: ignore
+                                                use_mmr=True)
+    except:
+        return []
     threshold = 0.2
     keywords = []
     for candidate in keywords_KPCV:
@@ -58,6 +61,7 @@ def keywords_relevance(speech_keywords, lyrics_keywords):
             keyword_pairs.append(pair)
             keyword_similarity_with_sentence.append(w2wsimilarity)
         # print(f"relevance of {token1.text} = {max(keyword_similarity_with_sentence)}. weight of this word = {weight(lyrics_keywords_text, lyrics_keywords_weight, sum(lyrics_keywords_weight), token1.text)}")
-        overall_similarity += max(keyword_similarity_with_sentence) * weight(lyrics_keywords_text, lyrics_keywords_weight, sum(lyrics_keywords_weight), token1.text)
+        if (len(keyword_similarity_with_sentence) > 0):
+            overall_similarity += max(keyword_similarity_with_sentence) * weight(lyrics_keywords_text, lyrics_keywords_weight, sum(lyrics_keywords_weight), token1.text)
     # print("Overall similarity:",overall_similarity)
     return overall_similarity, keyword_pairs
