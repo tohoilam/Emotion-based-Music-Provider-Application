@@ -1,7 +1,4 @@
-# Emotion-based Music Provider (Web Application)
-
-
-[![Spotify](https://spotify-github-readme.vercel.app/api/spotify)](https://open.spotify.com/collection/tracks)
+# Emotion-based Music Provider (Web Application Side)
 
  
 ## Project Overview
@@ -28,8 +25,6 @@ There are two ways to provide music to the users: Music Recommendation and Music
 
 #### Music Recommendation Landing Page
 
-<img width="1435" alt="MR Landing 2" src="https://github.com/tohoilam/Emotion-based-Music-Provider-Application/assets/61353084/fb826084-d285-49ef-833d-b56bde89866e">
-
 ##### <ins>Speech Input and Modes (Top-Left)</ins>
 
 * The user can record audio by clicking the record button or the user can upload an audio file
@@ -45,18 +40,58 @@ There are two ways to provide music to the users: Music Recommendation and Music
 
 ##### <ins>Music Recommended (Right)</ins>
 
-* All recommended music are displayed and are linked to Spotify
+* All recommended music is displayed and is linked to Spotify
 * User can play the music directly on the webpage or view on the Spotify app
 * The similarity rate of the music and the speech emotion is displayed alongside
 * When the user clicks on **"More Info"**, a **Statistical View Panel** will be expanded underneath explaining in detail the similarity between the speech input and the recommended music
 
+<img width="1435" alt="MR Landing 2" src="https://github.com/tohoilam/Emotion-based-Music-Provider-Application/assets/61353084/fb826084-d285-49ef-833d-b56bde89866e">
+
+
 #### Music Recommendation Statistical View
+
+Analyses on why and how the music is recommended given certain emotion is displayed through this statistical view. In-depth analyses on each aspect of the recommendation, including:
+
+* <ins>**Overall Analysis**</ins> 
+* <ins>**Audio & Acoustic Analysis:**</ins> Analysing the emotion expressed through your voice (tones, pitch, etc.) and the music
+* <ins>**Text & Lyrics Analysis:**</ins> Analysing the emotion expressed from the user's speech and song lyrics
+* <ins>**Semantics Analysis:**</ins> Analysing the meanings of user's speech and song lyrics
 
 ![MR Statistics Full](https://github.com/tohoilam/Emotion-based-Music-Provider-Application/assets/61353084/b2f5d09c-4e33-4cbc-bd48-c951d8f0ce42)
 
 
-
 ### Music Generation
 
+#### Music Generation Landing Page
+
+##### <ins>Speech Input and Modes (Top-Left)</ins>
+
+* The user can record audio by clicking the record button or the user can upload an audio file
+* There are 2 modes of generation:
+  1. Monophonic (One keynote at each timeframe)
+  2. Polyphonic (Many keynotes at each timeframe)
+
+##### <ins>Emotion Detection (Bottom-Left)</ins>
+
+* Detect emotion is displayed along with the confidence rate
+
+##### <ins>Music Generated (Right)</ins>
+
+* Three new symbolic music are generated and are displayed
+* User can play the music directly on the webpage
+* The similarity rate of the music and the speech emotion is displayed alongside
+* When the user clicks on **"More Info"**, a **Statistical View Panel** will be expanded underneath explaining in detail the similarity between the speech input and the generated music
+
+**NOTE: Each generation is unique**
+
 ![MG Generated Songs](https://github.com/tohoilam/Emotion-based-Music-Provider-Application/assets/61353084/a6f73ddb-f859-4a0b-bab9-ad93ba7c9fbb)
+
+
+#### Music Recommendation Statistical View
+
+Generated music is then passed to the emotion detection framework once again to double-check that the music generated has emotion aligned with the user's speech. Failing the check will force the application to re-generate a new piece of symbolic music. 
+
+Emotion of speech and generated music is then further illustrated in the statistical view.
+
+![MG Emotion Analysis](https://github.com/tohoilam/Emotion-based-Music-Provider-Application/assets/61353084/00453f1a-5b6e-40ce-8a5f-72104a48ec8c)
 
